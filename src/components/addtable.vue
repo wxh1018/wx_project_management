@@ -4,7 +4,7 @@
     <div class="addtablemain">
       <table class="addtabletable" border="1">
         <tr>
-          <td>项目地区</td>
+          <td width="10%">项目地区</td>
           <td colspan="2">
             <v-distpicker @selected="onChangeselected"></v-distpicker>
           </td>
@@ -128,19 +128,47 @@
         </tr>
         <tr>
           <td colspan="5">工作大纲</td>
-          <td colspan="5"><el-date-picker v-model="Work_outline" type="date" placeholder="选择日期" @change="changetime()"></el-date-picker></td>
+          <td colspan="5">
+            <el-date-picker
+              v-model="workingOutline"
+              type="date"
+              placeholder="选择日期"
+              @change="changetime()"
+            ></el-date-picker>
+          </td>
         </tr>
         <tr>
           <td colspan="5">初步成果</td>
-          <td colspan="5"><el-date-picker v-model="Preliminary_success" type="date" placeholder="选择日期" @change="changetime()"></el-date-picker></td>
+          <td colspan="5">
+            <el-date-picker
+              v-model="firstFruits"
+              type="date"
+              placeholder="选择日期"
+              @change="changetime()"
+            ></el-date-picker>
+          </td>
         </tr>
         <tr>
           <td colspan="5">中间成果</td>
-          <td colspan="5"><el-date-picker v-model="Intermediate_results" type="date" placeholder="选择日期" @change="changetime()"></el-date-picker></td>
+          <td colspan="5">
+            <el-date-picker
+              v-model="resultsAmong"
+              type="date"
+              placeholder="选择日期"
+              @change="changetime()"
+            ></el-date-picker>
+          </td>
         </tr>
         <tr>
           <td colspan="5">最终成果</td>
-          <td colspan="5"><el-date-picker v-model="Final_result" type="date" placeholder="选择日期" @change="changetime()"></el-date-picker></td>
+          <td colspan="5">
+            <el-date-picker
+              v-model="finalResult"
+              type="date"
+              placeholder="选择日期"
+              @change="changetime()"
+            ></el-date-picker>
+          </td>
         </tr>
       </table>
     </div>
@@ -219,10 +247,14 @@ export default {
   components: { VDistpicker },
   data() {
     return {
-      Work_outline:'',//工作大纲
-      Preliminary_success:'',//初步成果
-      Intermediate_results:'',//中间成果
-      Final_result:'',//最终成果
+      // //工作大纲
+      workingOutline: "",
+      // //初步成果 ;
+      firstFruits: "",
+      // //中间成果
+      resultsAmong: "",
+      // //最终成果
+      finalResult: "",
       // 定义项
       // 地区拼接
       site: "",
@@ -373,40 +405,27 @@ export default {
   computed: {
     time() {
       return this.base.GetTime();
+    },
+    person() {
+      return this.$store.state.person.person;
     }
   },
   created() {
     this.getdata();
   },
   methods: {
-    // 项目负责人
     getdata() {
       //获取负责人的数据
-      let params = { phone: this.$store.state.phone };
-      this.$axios.post(this.baseurl + "/ps/selRP", params).then(data => {
-        //展示分管负责人 data.data;
-        let arr = [];
-        data.data.forEach(v => {
-          arr.push({ value: v.person.trim() });
-        });
-        this.branchedpassageoptions = arr;
+      this.branchedpassageoptions = this.person.分管负责人.map(v => {
+        return { value: v.name };
       });
-      this.$axios.post(this.baseurl + "/ps/selPL", params).then(data => {
-        //展示项目负责人itemoptions
-        let arr = [];
-        data.data.forEach(v => {
-          arr.push({ value: v.person.trim() });
-        });
-        this.itemoptions = arr;
+      this.itemoptions = this.person.项目负责人.map(v => {
+        return { value: v.name };
       });
-      this.$axios.post(this.baseurl + "/ps/selPP", params).then(data => {
-        //展示参与人员
-        let arr = [];
-        data.data.forEach(v => {
-          arr.push({ value: v.person.trim() });
-        });
-        this.participationoptions = arr;
+      this.participationoptions = this.person.参与人员.map(v => {
+        return { value: v.name };
       });
+
     },
     // 选择地区
     onChangeselected(a) {
@@ -437,123 +456,122 @@ export default {
         this.ifaward = (this.contractamount - this.subpackage) * this.award;
       }
 
-      if (this.site == "") {
-        this.$message({
-          message: "请选择项目地区",
-          type: "error"
-        });
-      } else if (this.addtabletype == "") {
-        this.$message({
-          message: "请选择项目类型",
-          type: "error"
-        });
-      } else if (this.addtablenumber == "") {
-        this.$message({
-          message: "请输入项目编号",
-          type: "error"
-        });
-      } else if (this.addtablename == "") {
-        this.$message({
-          message: "请输入项目名称",
-          type: "error"
-        });
-      } else if (this.addtableconclude == "") {
-        this.$message({
-          message: "请选择合同签订情况",
-          type: "error"
-        });
-      } else if (this.contractamount == "") {
-        this.$message({
-          message: "请输入合同额",
-          type: "error"
-        });
-      } else if (this.gathering == "") {
-        this.$message({
-          message: "请输入收款",
-          type: "error"
-        });
-      } else if (this.subpackage == "") {
-        this.$message({
-          message: "请输入分包合同额",
-          type: "error"
-        });
-      } else if (this.prove == "") {
-        this.$message({
-          message: "请选择履历证明或节点证明",
-          type: "error"
-        });
-      } else if (this.branchedpassage == "") {
-        this.$message({
-          message: "请选择分管负责人",
-          type: "error"
-        });
-      } else if (this.item == "") {
-        this.$message({
-          message: "请选择项目负责人",
-          type: "error"
-        });
-      } else if (this.participation == "") {
-        this.$message({
-          message: "请选择参与人员",
-          type: "error"
-        });
-      } else if (this.time == "") {
-        this.$message({
-          message: "请选择日期",
-          type: "error"
-        });
-      } else if (this.explain == "") {
-        this.$message({
-          message: "请输入说明",
-          type: "error"
-        });
-      } else {
-        // if(typeof(this.participation))
-        console.log(this.participation);
-        if (typeof this.participation != "string") {
-          let arr = this.participation.join(",");
-          this.participation = arr;
-        }
-        this.$axios
-          .post(this.baseurl + "/ps/saveProject", {
-            address: this.site,
-            projectType: this.addtabletype,
-            projectNum: this.addtablenumber,
-            projectNam: this.addtablename,
-            contractSigning: this.addtableconclude,
-            contractAmount: this.contractamount,
-            collection: this.gathering,
-            collectionRatio: (this.gathering / this.contractamount).toFixed(2),
-            amountSubcontract: this.subpackage,
-            netValueOf: this.contractamount - this.subpackage,
-            bonusCoefficient: this.award,
-            distributableValue: this.ifaward,
-            performanceCertificate: this.prove,
-            responsiblePerson: this.branchedpassage,
-            projectLeader: this.item,
-            participant: this.participation,
-            date: this.standardtime,
-            schedule: this.explain,
-            questionsSuggestions: this.suggest,
-            remark: this.remark,
-            phone: this.$store.state.phone
-          })
-          .then(res => {
-            console.log(res);
-            if (res.data.msg == "保存成功") {
-              this.$message({
-                message: "项目提交成功",
-                type: "success"
-              });
-              this.participation = [];
-              this.$emit("clo");
-              //   setTimeout(function() {
-
-              //     // location.reload();
-              //   }, 1000);
-            }
-          });
+      // if (this.site == "") {
+      //   this.$message({
+      //     message: "请选择项目地区",
+      //     type: "error"
+      //   });
+      // } else if (this.addtabletype == "") {
+      //   this.$message({
+      //     message: "请选择项目类型",
+      //     type: "error"
+      //   });
+      // } else if (this.addtablenumber == "") {
+      //   this.$message({
+      //     message: "请输入项目编号",
+      //     type: "error"
+      //   });
+      // } else if (this.addtablename == "") {
+      //   this.$message({
+      //     message: "请输入项目名称",
+      //     type: "error"
+      //   });
+      // } else if (this.addtableconclude == "") {
+      //   this.$message({
+      //     message: "请选择合同签订情况",
+      //     type: "error"
+      //   });
+      // } else if (this.contractamount == "") {
+      //   this.$message({
+      //     message: "请输入合同额",
+      //     type: "error"
+      //   });
+      // } else if (this.gathering == "") {
+      //   this.$message({
+      //     message: "请输入收款",
+      //     type: "error"
+      //   });
+      // } else if (this.subpackage == "") {
+      //   this.$message({
+      //     message: "请输入分包合同额",
+      //     type: "error"
+      //   });
+      // } else if (this.prove == "") {
+      //   this.$message({
+      //     message: "请选择履历证明或节点证明",
+      //     type: "error"
+      //   });
+      // } else if (this.branchedpassage == "") {
+      //   this.$message({
+      //     message: "请选择分管负责人",
+      //     type: "error"
+      //   });
+      // } else if (this.item == "") {
+      //   this.$message({
+      //     message: "请选择项目负责人",
+      //     type: "error"
+      //   });
+      // } else if (this.participation == "") {
+      //   this.$message({
+      //     message: "请选择参与人员",
+      //     type: "error"
+      //   });
+      // } else if (this.explain == "") {
+      //   this.$message({
+      //     message: "请输入说明",
+      //     type: "error"
+      //   });
+      // } else {
+      // if(typeof(this.participation))
+      console.log(this.participation);
+      if (typeof this.participation != "string") {
+        let arr = this.participation.join(",");
+        this.participation = arr;
       }
+      this.$axios
+        .post(this.baseurl + "/ps/saveProject", {
+          address: this.site,
+          projectType: this.addtabletype,
+          projectNum: this.addtablenumber,
+          projectNam: this.addtablename,
+          contractSigning: this.addtableconclude,
+          contractAmount: this.contractamount,
+          collection: this.gathering,
+          collectionRatio: (this.gathering / this.contractamount).toFixed(2),
+          amountSubcontract: this.subpackage,
+          netValueOf: this.contractamount - this.subpackage,
+          bonusCoefficient: this.award,
+          distributableValue: this.ifaward,
+          performanceCertificate: this.prove,
+          responsiblePerson: this.branchedpassage,
+          projectLeader: this.item,
+          participant: this.participation,
+          date: this.standardtime,
+          schedule: this.explain,
+          questionsSuggestions: this.suggest,
+          remark: this.remark,
+          phone: this.$store.state.phone,
+          workingOutline: this.workingOutline,
+          firstFruits: this.firstFruits,
+          resultsAmong: this.resultsAmong,
+          finalResult: this.finalResult
+        })
+        .then(res => {
+          console.log(res);
+          if (res.data.msg == "保存成功") {
+            this.$message({
+              message: "项目提交成功",
+              type: "success"
+            });
+            this.participation = [];
+            this.$emit("clo");
+            //   setTimeout(function() {
+
+            //     // location.reload();
+            //   }, 1000);
+          }
+        });
+      // }
     },
     // 导出按钮
     derive() {
@@ -617,13 +635,6 @@ export default {
 .addtablebuttonmin:hover {
   background: #202e63 !important;
   color: gold !important;
-}
-.distpicker-address-wrapper select {
-  background: #000c3b !important;
-  border: 1px solid #6b79a8 !important;
-  border-radius: 0px !important;
-  color: white !important;
-  width: 31%;
 }
 .el-textarea__inner {
   padding: 0px 5px !important;

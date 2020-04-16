@@ -6,7 +6,52 @@
 <script>
 export default {
   created() {
+    this.resh();
+    this.person();
     this.$store.commit("setPhone", localStorage.phone);
+    this.base.AddStyle(`
+      .el-input__inner {
+          background: none !important;
+          color: #fff !important;
+          border: 1px solid #000c3b !important;
+      }`);
+  },
+  computed: {
+    uId() {
+      return this.$store.state.root.uId;
+    }
+  },
+  methods: {
+    // 人员
+    person() {
+      let params = { uId: this.uId };
+      this.$axios.post(this.baseurl + "/manage/findAll", params).then(data => {
+        this.$store.commit('set_person',data.data)
+        // this.direction = data.data.方向负责人;
+        // this.ResponsiblePerson = data.data.分管负责人;
+        // this.projectLeader = data.data.项目负责人;
+        // this.participant = data.data.参与人员;
+        // console.log(this.direction);
+      });
+    },
+    resh() {
+      //在页面加载时读取sessionStorage里的状态信息
+      if (sessionStorage.getItem("store")) {
+        this.$store.replaceState(
+          Object.assign(
+            {},
+            this.$store.state,
+            JSON.parse(sessionStorage.getItem("store"))
+          )
+        );
+        sessionStorage.removeItem("store");
+      }
+
+      //在页面刷新时将vuex里的信息保存到sessionStorage里
+      window.addEventListener("beforeunload", () => {
+        sessionStorage.setItem("store", JSON.stringify(this.$store.state));
+      });
+    }
   }
 };
 </script>
@@ -31,7 +76,51 @@ export default {
 .el-upload-list__item-name {
   color: #00e1fd !important;
 }
-.el-progress__text{
-  color: #00e1fd!important;
+.el-progress__text {
+  color: #00e1fd !important;
+}
+.el-dialog {
+  width: 82% !important;
+  height: 75% !important;
+  border: 1px solid #fff;
+  background: #000c3b !important;
+}
+.addproject {
+  width: 150px !important;
+}
+.el-breadcrumb__inner {
+  color: white !important;
+}
+.distpicker-address-wrapper select {
+  background: #000c3b !important;
+  border: 1px solid #6b79a8 !important;
+  border-radius: 0px !important;
+  color: white !important;
+  width: 90px !important;
+}
+.el-input__inner {
+  background: none !important;
+  color: #fff !important;
+  border: 1px solid #000c3b !important;
+}
+.el-textarea__inner {
+  padding: 0px 5px !important;
+  border-radius: 0 !important;
+  background: #000c3b !important;
+  border: none !important;
+  color: white !important;
+}
+.el-dialog__body {
+  height: 82% !important;
+}
+.el-progress-bar {
+  padding-right: 50px;
+  width: 80% !important;
+  margin-right: -55px;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+}
+.schedule_add {
+  z-index: 9999 !important;
 }
 </style>

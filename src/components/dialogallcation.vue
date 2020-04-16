@@ -389,6 +389,5 @@ export default {
   color: gold !important;
 }
 .el-select {
-  width: 100% !important;
 }
 </style>

@@ -20,8 +20,7 @@ Vue.component('v-distpicker', VDistpicker)
 Vue.use(ElementUI);
 Vue.config.productionTip = false
 window.router=router
-// Vue.prototype.baseurl = 'http://gu.free-http.svipss.top'
-Vue.prototype.baseurl = 'http://119.3.210.185:8921'
+Vue.prototype.baseurl = 'http://www.free-http.svipss.top'
 router.beforeEach((to, from, next) => {
   let token = localStorage.getItem("phone") || "";
   if(token){

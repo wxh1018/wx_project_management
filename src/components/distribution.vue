@@ -280,17 +280,15 @@ export default {
         type: "warning"
       })
         .then(() => {
-          this.$axios
-            .post(this.baseurl+"/pv/del", { id: v })
-            .then(data => {
-              console.log(data);
-              this.$message({
-                message: "删除成功",
-                type: "success"
-              });
-              this.gettwodata();
-              this.noti();
+          this.$axios.post(this.baseurl + "/pv/del", { id: v }).then(data => {
+            console.log(data);
+            this.$message({
+              message: "删除成功",
+              type: "success"
             });
+            this.gettwodata();
+            this.noti();
+          });
         })
         .catch(() => {
           this.$message({
@@ -330,7 +328,7 @@ export default {
     distribution() {
       this.gettwodata();
       this.$axios
-        .post(this.baseurl+"/ps/selPV", {
+        .post(this.baseurl + "/ps/selPV", {
           id: this.id
         })
         .then(res => {
@@ -384,39 +382,37 @@ export default {
             100
         };
         console.log(params);
-        this.$axios
-          .post(this.baseurl+"/pv/save", params)
-          .then(res => {
-            if (res.data.msg == "OK") {
-              console.log(res);
-              this.$axios
-                .post(this.baseurl+"/pv/selNum", {
-                  projectNum: this.projectNum
-                })
-                .then(res => {
-                  console.log(res);
-                });
-              // this.changeallocationdata.push(params);
-              this.$message({
-                message: "产值分配更改成功",
-                type: "success"
+        this.$axios.post(this.baseurl + "/pv/save", params).then(res => {
+          if (res.data.msg == "OK") {
+            console.log(res);
+            this.$axios
+              .post(this.baseurl + "/pv/selNum", {
+                projectNum: this.projectNum
+              })
+              .then(res => {
+                console.log(res);
               });
-              this.gettwodata();
-              this.noti();
-              // setTimeout(function() {
-              //   router.push({
-              //     path: "/allocation",
-              //     query: { projectNum: this.projectNum }
-              //   });
-              // location.reload();
-              // }, 1000);
-            } else {
-              this.$message({
-                message: "更改失败" + res.data.msg,
-                type: "error"
-              });
-            }
-          });
+            // this.changeallocationdata.push(params);
+            this.$message({
+              message: "产值分配更改成功",
+              type: "success"
+            });
+            this.gettwodata();
+            this.noti();
+            // setTimeout(function() {
+            //   router.push({
+            //     path: "/allocation",
+            //     query: { projectNum: this.projectNum }
+            //   });
+            // location.reload();
+            // }, 1000);
+          } else {
+            this.$message({
+              message: "更改失败" + res.data.msg,
+              type: "error"
+            });
+          }
+        });
       }
     },
     // 查看产值分配按钮
@@ -427,23 +423,25 @@ export default {
       });
     },
     gettwodata() {
-      this.$axios.post(this.baseurl+"/pv/selNum", {
-        phone:this.$store.state.phone
-      }).then(res => {
-        // this.$store.commit("setdata", res.data);
-        // this.$store.commit("setIsone", true);
-        console.log(res);
-        res.data.length == 0 ? (this.isshow = false) : (this.isshow = true);
-        this.changeallocationdata = res.data.filter(
-          v => v.projectNum == this.projectNum
-        );
-      });
+      this.$axios
+        .post(this.baseurl + "/pv/selNum", {
+          phone: this.$store.state.phone
+        })
+        .then(res => {
+          // this.$store.commit("setdata", res.data);
+          // this.$store.commit("setIsone", true);
+          console.log(res);
+          res.data.length == 0 ? (this.isshow = false) : (this.isshow = true);
+          this.changeallocationdata = res.data.filter(
+            v => v.projectNum == this.projectNum
+          );
+        });
     },
     noti() {
       //      this.baseurl+ /pv/selCount 个数
       //this.baseurl+ /pv/selRatio 比例
       this.$axios
-        .post(this.baseurl+"/pv/selCount", {
+        .post(this.baseurl + "/pv/selCount", {
           projectNum: this.projectNum
         })
         .then(data => {
@@ -451,7 +449,7 @@ export default {
           this.pNum = data.data;
         });
       this.$axios
-        .post(this.baseurl+"/pv/selRatio", {
+        .post(this.baseurl + "/pv/selRatio", {
           projectNum: this.projectNum
         })
         .then(data => {
@@ -481,7 +479,7 @@ export default {
     });
     this.id = this.message;
     this.$axios
-      .post(this.baseurl+"/ps/selPV", {
+      .post(this.baseurl + "/ps/selPV", {
         id: this.id
       })
       .then(res => {
@@ -552,9 +550,6 @@ export default {
   background: #202e63 !important;
   color: gold !important;
 }
-.el-select {
-  width: 100% !important;
-}
 .allocationmain {
   height: 82% !important;
   overflow: auto;
@@ -570,5 +565,31 @@ export default {
   color: red;
   position: absolute;
   top: 46%;
+}
+.allocationtable {
+  width: 100%;
+  border: 1.5px solid #6b79a8;
+  text-align: center;
+  margin-top: 0.2%;
+}
+.allocationtable tr th {
+  height: 55px;
+  color: white;
+  font-size: 16px;
+}
+.allocationtable tr td {
+  height: 50px;
+  font-size: 15px;
+  color: #00e1fd;
+  width: 10%;
+}
+.allocationtable tr:hover th {
+  background: #000c3b;
+}
+.allocationtable tr:hover {
+  background: #05326d;
+}
+.allocationtable tr:hover td {
+  color: gold;
 }
 </style>

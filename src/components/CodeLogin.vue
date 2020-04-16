@@ -60,54 +60,57 @@ export default {
         });
         return;
       }
+      //超级管理员
       if (this.code == this.$store.state.superpwd) {
-        if(!this.phoneFg(this.phone)){
-          return
-        }
-        this.$message({
-          message: "登陆成功！ 尊敬的" + this.phone + "用户",
-          type: "success"
-        });
-        localStorage.phone = this.phone;
-        this.$store.commit("setPhone", this.phone);
-        var userphone = this.phone;
-        localStorage.setItem("user", JSON.stringify(userphone));
-        this.$router.push({ path: "/project" });
+        if (!this.phoneFg(this.phone)) {
+          return;
+        } 
+        this.tologin()
         return;
       }
       if (this.code == "") {
-        this.$message({
-          message: "请输入验证码",
-          type: "error"
-        });
-        return;
+        // this.$message({
+        //   message: "请输入验证码",
+        //   type: "error"
+        // });
+        // return;
       }
       if (this.code != this.truecode) {
-        this.$message({
-          message: "验证码有误，请检查！",
-          type: "error"
-        });
-        return;
+        // this.$message({
+        //   message: "验证码有误，请检查！",
+        //   type: "error"
+        // });
+        // return;
       }
       if (this.phone != this.truePhone) {
-        this.$message({
-          message: "检测到当前手机号，不是获取验证码的手机号，请重试！",
-          type: "error"
-        });
-        return;
+        // this.$message({
+        //   message: "检测到当前手机号，不是获取验证码的手机号，请重试！",
+        //   type: "error"
+        // });
+        // return;
       }
-
-      this.$message({
-        message: "登陆成功！ 尊敬的" + this.phone + "用户",
-        type: "success"
-      });
-      localStorage.phone = this.phone;
-      this.$store.commit("setPhone", this.phone);
-      localStorage.setItem("user", JSON.stringify(this.phone));
-      this.$router.push({ path: "/project" });
-      //   }
-      // });
-      //   }
+      this.tologin()
+    },
+    tologin() {
+      this.$axios
+        .post(this.baseurl + "/user/phoneLogin", {
+          phone: this.phone
+        })
+        .then(data => {
+          this.$axios.post(this.baseurl+'/manage/selPhone',{ phone: this.phone}).then(data=>{
+            console.log(data);
+            this.$store.commit('set_user_msg',data.data[0])
+          })
+          this.$message({
+            message: "登陆成功！ 尊敬的" + this.phone + "用户",
+            type: "success"
+          });
+          localStorage.phone = this.phone;
+          this.$store.commit("setPhone", this.phone);
+          var userphone = this.phone;
+          localStorage.setItem("user", JSON.stringify(userphone));
+          this.$router.push({ path: "/project" });
+        });
     },
     // 获取验证码
     getCode() {

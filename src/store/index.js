@@ -1,6 +1,8 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-
+import market from './market'
+import root from './root'
+import person from './person'
 Vue.use(Vuex)
 
 export default new Vuex.Store({
@@ -39,5 +41,8 @@ export default new Vuex.Store({
   actions: {
   },
   modules: {
+    market,
+    root,
+    person
   }
 })

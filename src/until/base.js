@@ -85,6 +85,19 @@ let base = {
         var gg_lng = z * Math.cos(theta);
         var gg_lat = z * Math.sin(theta);
         return [gg_lng, gg_lat]
+    },
+    //隐藏手机号  178****8796
+    filter_phone(phone) {
+        let center = phone.toString().substr(3, 4);
+        var e = new RegExp(center, "g");
+        phone = phone.toString().replace(e, '****')
+        return phone
+    },
+    // str字符串    reallyD0替换谁  replaceWith替换成什么
+    del_html_tags(str, reallyDo, replaceWith) {
+        var e = new RegExp(reallyDo, "g");
+        let words = str.replace(e, replaceWith);
+        return words;
     }
 }
 export default base

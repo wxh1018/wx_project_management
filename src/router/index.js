@@ -1,9 +1,9 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Home from '../components/home.vue'
-import project from '../components/project.vue'
-import allocation from '../components/allocation.vue'
 Vue.use(VueRouter)
+
+import market from './market'
 
 const routes = [
   {
@@ -14,10 +14,10 @@ const routes = [
     children: [
       {
         path: 'project',
-        component: project
+        component: () => import('../components/project.vue')
       }, {
         path: 'allocation',
-        component: allocation
+        component: () => import('../components/allocation.vue')
       }, {
         path: 'Statistical',
         component: () => import('../components/Statistical.vue')
@@ -25,9 +25,12 @@ const routes = [
       {
         path: 'Personal',
         component: () => import('../components/Personal.vue')
-      },{
-        path:'market',
-        component:()=>import('../views/Market_tracking/Index.vue')
+      },
+      {
+        path: '/market',
+        name:'market',
+        component: () => import('../views/Market_tracking/Index.vue'),
+        children: market
       }
     ]
   },

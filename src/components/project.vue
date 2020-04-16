@@ -201,16 +201,6 @@ export default {
             message: "已取消删除"
           });
         });
-      // function up() {
-      //   _this.$axios.post(this.baseurl + "/ps/del", a).then(data => {
-      //     console.log(data);
-      //     _this.defaultproject();
-      //     _this.$message({
-      //       type: "success",
-      //       message: "删除成功!"
-      //     });
-      //   });
-      // }
     },
     clo() {
       console.log(2);

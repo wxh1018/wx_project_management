@@ -15,17 +15,17 @@
       <div class="projecttable">
         <table border="1" class="tabledata">
           <tr>
-            <th>项目编号</th>
             <th>项目名称</th>
-            <th>项目负责人</th>
-            <th>录入时间</th>
-            <th>操作</th>
+            <th>预期合同额</th>
+            <th>是否开跟踪号</th>
+            <th>跟踪负责人</th>
+            <th width="25%">操作</th>
           </tr>
-          <tr v-for="(item,index) in allproject" :key="index">
-            <td>{{item.projectNum}}</td>
-            <td>{{item.projectNam}}</td>
-            <td>{{item.projectLeader}}</td>
-            <td>{{item.date}}</td>
+          <tr v-for="(item,index) in show_data" :key="index">
+            <td>{{item.projectName}}</td>
+            <td>{{item.contractAmount}}</td>
+            <td>{{item.trackingNumber}}</td>
+            <td>{{item.principal}}</td>
             <td class="lasttd">
               <!-- <el-button type="primary" class="operationbutton" @click="detail(item.id)">查看详情</el-button>
               <el-button type="primary" class="operationbutton" @click="Update(item.id)">更新项目</el-button>-->
@@ -42,41 +42,123 @@
               >删除项目</el-button>
             </td>
           </tr>
-          <tr v-if="this.allproject.length == 0">
+          <tr v-if="this.show_data.length == 0">
             <td colspan="9">此项目暂无产值分配</td>
           </tr>
         </table>
       </div>
     </div>
+    <!-- 分页 -->
+    <div class="paging">
+      <el-pagination
+        @current-change="handleCurrentChange"
+        background
+        :current-page.sync="currentPage3"
+        :page-size.sync="pageSize"
+        layout="prev, pager, next"
+        :total="total_data.length"
+      ></el-pagination>
+    </div>
+    <!-- 弹窗 -->
+    <el-dialog :visible.sync="show_dialog" id="market_dialog">
+      <router-view @close="close" />
+    </el-dialog>
   </div>
 </template>
 <script>
 export default {
   data() {
     return {
+      // 地址
+      // private String address;
+      // // 项目类型
+      // private String projectType;
+      // // 项目名称
+      // private String projectName;
+      // // 预期合同额
+      // private String contractAmount;
+      // // 是否开跟踪号
+      // private String trackingNumber;
+      // // 跟踪负责人
+      // private String principal;
+      // // 信息来源
+      // private String informationSource;
+      // // 价值等级
+      // private String valueLevel;
+      // // 备注
+      // private String remark;
+
+      // // 手机号
+      // private String phone;
       Progress: false,
-      adddialogVisible: false,
-      distributiondialogVisible: false,
-      detaildialogVisible: false,
-      UpdatedialogVisible: false,
+      show_dialog: false, //添加项目
       // 分页
-      allproject: [1],
-      allproject1: [],
       currentPage3: 1,
       pageSize: 10,
-      data: []
+      show_data: [] //展示的数据
     };
   },
   components: {},
-  computed: {},
-  watch: {},
+  computed: {
+    total_data() {
+      return this.$store.state.market.totalData;
+    }
+  },
+  watch: {
+    show_dialog(v) {
+      if (!v) {
+        this.$router.push("/market");
+      }
+    },
+    total_data(v) {
+      //总数据
+      console.log(v);
+      this.mod_show_data(v);
+    }
+  },
   created() {
     this.$store.commit("set_active", "market");
   },
-  mounted() {},
+  mounted() {
+    //获取数据
+    this.$store.dispatch("get_totalData");
+  },
   methods: {
+    //关闭页面
+    close() {
+      this.show_dialog = false;
+    },
+    mod_show_data(v) {
+      this.show_data = this.base.ChangePage(
+        this.pageSize,
+        this.currentPage3,
+        v
+      );
+    },
+    //点击分页
+    handleCurrentChange() {
+      this.show_data = this.base.ChangePage(
+        this.pageSize,
+        this.currentPage3,
+        this.total_data
+      );
+    },
+    //添加项目
     add() {
-      this.adddialogVisible = true;
+      this.show_dialog = true;
+      this.$router.push("/market_add");
+    },
+    //查看更改
+    detailUpdate(v) {
+      this.$store.commit("set_edit_id", v);
+      this.show_dialog = true;
+      this.$router.push("/market_edit");
+    },
+    //进度跟踪
+    Progress_tracking(id) {
+      this.$store.commit("set_edit_id", id);
+      this.show_dialog = true;
+      this.$router.push("/market_schedule");
     },
     //删除项目
     delet(a) {
@@ -87,11 +169,7 @@ export default {
         type: "warning"
       })
         .then(() => {
-          console.log(1);
-          // up();
-          _this.$axios.post(this.baseurl + "/ps/del", a).then(data => {
-            console.log(data);
-            _this.defaultproject();
+          this.$store.dispatch("delete_totalData").then(data => {
             _this.$message({
               type: "success",
               message: "删除成功!"
@@ -112,11 +190,11 @@ export default {
 .wrap {
   width: 100%;
   height: 100%;
-  border: 1px solid white;
   box-sizing: border-box;
+  position: relative;
 }
-.el-dialog {
-  width: 82% !important;
+market_dialog .el-dialog {
+  width: 60% !important;
   height: 75% !important;
   border: 1px solid #fff;
   background: #000c3b !important;
@@ -172,6 +250,9 @@ export default {
   overflow: auto;
 }
 .paging {
+  position: absolute;
+  bottom: 0;
+  right: 0;
   width: 100%;
   height: 6%;
   display: flex;
@@ -224,5 +305,12 @@ export default {
 }
 .operationbutton:hover {
   color: gold !important;
+}
+.distpicker-address-wrapper select {
+  background: #000c3b !important;
+  border: 1px solid #6b79a8 !important;
+  border-radius: 0px !important;
+  color: white !important;
+  width: 31%;
 }
 </style>

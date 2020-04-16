@@ -10,20 +10,11 @@
         <td width="12%">
           <div>项目名称</div>
         </td>
-        <td width="7%">
-          <div>项目编号</div>
-        </td>
         <td width="10%">
           <div>项目负责人</div>
         </td>
         <td width="8%">
           <div>时间节点</div>
-        </td>
-        <td width="12%">
-          <div>工作进度（%）</div>
-        </td>
-        <td width="12%">
-          <div>收款进度（%）</div>
         </td>
         <td width="15%">
           <div>详细描述</div>
@@ -36,39 +27,16 @@
         </td>
       </thead>
       <tbody>
-        <tr v-for="(item, id) in filterdata" :key="id">
+        <tr v-for="(item, id) in month_show_data" :key="id">
           <td>{{id+1}}</td>
           <td>
-            <div class="tddiv">{{item.projectNam}}</div>
+            <div class="tddiv">{{item.projectName}}</div>
           </td>
           <td>
-            <div class="tddiv">{{item.projectNum}}</div>
-          </td>
-          <td>
-            <div class="tddiv">{{item.projectLeader}}</div>
+            <div class="tddiv">{{item.principal}}</div>
           </td>
           <td>
             <div class="tddiv">{{item.date}}</div>
-          </td>
-          <td>
-            <div class="tddiv">
-              <el-progress
-                :text-inside="false"
-                :stroke-width="18"
-                :percentage="item.jobSchedule"
-                :color="customColors"
-              ></el-progress>
-            </div>
-          </td>
-          <td>
-            <div class="tddiv">
-              <el-progress
-                :text-inside="false"
-                :stroke-width="18"
-                :percentage="item.collectionSchedule"
-                :color="customColors"
-              ></el-progress>
-            </div>
           </td>
           <td>
             <div class="tddiv detail">{{item.detail}}</div>
@@ -81,7 +49,7 @@
             <button class="basebtn twobtn" @click="del(item.id)">删除</button>
           </td>
         </tr>
-        <tr v-if="filterdata.length == []">
+        <tr v-if="mon_data.length == []">
           <td colspan="10">暂无数据</td>
         </tr>
       </tbody>
@@ -95,7 +63,7 @@
         :current-page.sync="currentPage"
         :page-size.sync="pageSize"
         layout="prev, pager, next"
-        :total="data.length"
+        :total="mon_data.length"
       ></el-pagination>
     </div>
     <!-- 底部按钮 -->
@@ -104,7 +72,7 @@
       <div class="basebtn" @click="exportData">导出数据</div>
     </div>
     <!-- 添加进度 -->
-    <el-dialog :visible.sync="addShow">
+    <el-dialog class="schedule_add" append-to-body :visible.sync="addShow">
       <table class="addpro">
         <tr>
           <td>项目名称</td>
@@ -112,43 +80,28 @@
             <!-- <input v-model="add.projectName" type="text" /> -->
             <p>{{add.projectName}}</p>
           </td>
-          <td>项目编号</td>
+          <td>项目类型</td>
           <td>
             <!-- <input type="text" v-model="add.projectId" /> -->
-            <p>{{add.projectId}}</p>
+            <p>{{add.projectType}}</p>
           </td>
         </tr>
         <tr>
           <td>项目负责人</td>
           <td>
             <!-- <input type="text" v-model="add.projectPerson" /> -->
-            <p>{{add.projectPerson}}</p>
+            <p>{{add.principal}}</p>
           </td>
           <td>时间节点</td>
           <td>
-            <el-date-picker v-model="date" type="date" placeholder="选择日期" @change="changetime()"></el-date-picker>
-          </td>
-        </tr>
-        <tr>
-          <td>工作进度(%)</td>
-          <td>
-            <el-autocomplete
-              class="inline-input"
-              v-model="add.workProgress"
-              :fetch-suggestions="querySearch"
-              placeholder="请输入内容"
-              @select="handleSelect"
-            ></el-autocomplete>
-          </td>
-          <td>收款进度(%)</td>
-          <td>
-            <el-autocomplete
-              class="inline-input"
-              v-model="add.collectionProgress"
-              :fetch-suggestions="querySearch"
-              placeholder="请输入内容"
-              @select="handleSelect"
-            ></el-autocomplete>
+            <!-- <el-date-picker v-model="date" type="date" placeholder="选择日期" @change="changetime()"></el-date-picker> -->
+            <el-date-picker
+              v-model="date"
+              type="date"
+              placeholder="选择日期"
+              format="yyyy 年 MM 月 dd 日"
+              value-format="yyyy-MM-dd"
+            ></el-date-picker>
           </td>
         </tr>
         <tr>
@@ -158,12 +111,6 @@
           </td>
           <td>附件上传</td>
           <td>
-            <!-- <div class="basebtn" @click="uploadImg">上传文件</div> -->
-            <!-- <form action="http://gu.free-http.svipss.top/upload/add" method="post" enctype="multipart/from-data">
-                <input type="file">
-                <input type="submit" value="上传">
-            </form>-->
-
             <el-upload
               class="upload-demo"
               action="http://119.3.210.185:8921/upload/add"
@@ -194,53 +141,35 @@
       >添加</button>
     </el-dialog>
     <!-- 更新进度 -->
-    <el-dialog :visible.sync="updateShow">
+    <el-dialog :visible.sync="updateShow" append-to-body>
       <table class="addpro">
         <tr>
           <td>项目名称</td>
           <td>
-            <!-- <input v-model="update.projectName" type="text" /> -->
-            <p>{{update.projectName}}</p>
+            <!-- <input v-model="add.projectName" type="text" /> -->
+            <p>{{add.projectName}}</p>
           </td>
-          <td>项目编号</td>
+          <td>项目类型</td>
           <td>
-            <!-- <input type="text" v-model="update.projectId" /> -->
-            <p>{{update.projectId}}</p>
+            <!-- <input type="text" v-model="add.projectId" /> -->
+            <p>{{add.projectType}}</p>
           </td>
         </tr>
         <tr>
           <td>项目负责人</td>
           <td>
-            <!-- <input type="text" v-model="update.projectPerson" /> -->
-            <p>{{update.projectPerson}}</p>
+            <p>{{add.principal}}</p>
           </td>
           <td>时间节点</td>
           <td>
-            <el-date-picker v-model="date1" type="date" placeholder="选择日期" @change="changetime2()"></el-date-picker>
-          </td>
-        </tr>
-        <tr>
-          <td>工作进度(%)</td>
-          <td>
-            <input type="text" v-model="update.workProgress" />
-            <!-- <el-autocomplete
-              class="inline-input"
-              v-model="update.workProgress"
-              :fetch-suggestions="querySearch"
-              placeholder="请输入内容"
-              @select="handleSelect"
-            ></el-autocomplete>-->
-          </td>
-          <td>收款进度(%)</td>
-          <td>
-            <input type="text" v-model="update.collectionProgress" />
-            <!-- <el-autocomplete
-              class="inline-input"
-              v-model="update.collectionProgress"
-              :fetch-suggestions="querySearch"
-              placeholder="请输入内容"
-              @select="handleSelect"
-            ></el-autocomplete>-->
+            <!-- <el-date-picker v-model="date1" type="date" placeholder="选择日期" @change="changetime2()"></el-date-picker> -->
+            <el-date-picker
+              v-model="date1"
+              type="date"
+              placeholder="选择日期"
+              format="yyyy 年 MM 月 dd 日"
+              value-format="yyyy-MM-dd"
+            ></el-date-picker>
           </td>
         </tr>
         <tr>
@@ -281,7 +210,7 @@
       >确认更新</button>
     </el-dialog>
     <!-- 查看附件 -->
-    <el-dialog :visible.sync="fileshow">
+    <el-dialog :visible.sync="fileshow" append-to-body>
       <div class="fileshow">
         <p v-if="fileList2.length == 0" class="nofile">暂无附件</p>
         <ul class="showfiles">
@@ -325,6 +254,7 @@ import XLSX from "xlsx";
 export default {
   data() {
     return {
+      month_show_data: "",
       tipmsg1: false,
       tipmsg2: false,
       customColors: [
@@ -338,7 +268,6 @@ export default {
       currentPage: 1, //当前页数
       pageSize: 10, //每页多少条
       data: [], //数据
-      filterdata: [],
       addShow: false, //添加进度更新
       updateShow: false, //更新页面
       loading: false,
@@ -349,20 +278,18 @@ export default {
       add: {
         //添加的数据
         projectName: "", //projectNam
-        projectId: "", //projectNum
-        projectPerson: "", //projectLeader
-        workProgress: "", //jobSchedule
-        collectionProgress: "", //collectionSchedule
+        projectType: "", //
+        principal: "", //
+        date: "", //
         detail: "" //detail
       },
       update: {
         //更新的数据
-        projectName: "", //
-        projectId: "",
-        projectPerson: "",
-        workProgress: "",
-        collectionProgress: "",
-        detail: "",
+        projectName: "", //projectNam
+        projectType: "", //
+        principal: "", //
+        date: "", //
+        detail: "", //detail
         accessory: ""
       },
       peopleoptions: [
@@ -471,6 +398,16 @@ export default {
   computed: {
     pid() {
       return this.$store.state.pId;
+    },
+    id() {
+      return this.$store.state.market.edit_id;
+    },
+    phone() {
+      return this.$store.state.phone;
+    },
+    //月报总数据
+    mon_data() {
+      return this.$store.state.market.mon_data;
     }
   },
   watch: {
@@ -481,6 +418,14 @@ export default {
       this.pId = v;
       console.log(this.pId);
       this.getData();
+    },
+    mon_data(v) {
+      console.log(v);
+      this.month_show_data = this.base.ChangePage(
+        this.pageSize,
+        this.currentPage,
+        v
+      );
     }
   },
   created() {
@@ -495,13 +440,15 @@ export default {
       console.log(item);
     },
     getData() {
-      this.$axios
-        .post(this.baseurl + "/schedule/sel", { id: this.pid })
-        .then(data => {
-          console.log("总数据", data);
-          this.data = data.data;
-          this.changePage();
-        });
+      let no_change = this.$store.getters.findmon_byid(this.id);
+      console.log(no_change);
+      this.add.projectName = no_change.projectName;
+      this.add.projectType = no_change.projectType;
+      this.add.principal = no_change.principal;
+
+      this.$store.dispatch("get_mon_data").then(data => {
+        this.changePage();
+      });
     },
     //添加
     handsuccess(file, fileList) {
@@ -549,9 +496,9 @@ export default {
       // console.log(file);
       // let size = file.size;
       // if (size > 1024 * 10) {
-        // this.base.warn(this, "该文件超出10M,正在取消上传");
-        // this.tipmsg1 = true;
-        // return;
+      // this.base.warn(this, "该文件超出10M,正在取消上传");
+      // this.tipmsg1 = true;
+      // return;
       // }
     },
     beforeRemove2(file, fileList2) {
@@ -593,16 +540,11 @@ export default {
     },
     //添加进度更新
     addPro() {
-      console.log(1);
       this.addShow = true;
-      console.log(this.$store.state.threeproject);
-      let obj = this.$store.state.threeproject;
-      this.add.projectName = obj.projectNam;
-      this.add.projectId = obj.projectNum;
-      this.add.projectPerson = obj.projectLeader;
     },
     changetime() {
       var date = new Date(this.date);
+
       var month = date.getMonth() + 1;
       if (month < 10) {
         month = "0" + (date.getMonth() + 1);
@@ -629,70 +571,44 @@ export default {
     },
     //添加项目
     sureadd() {
-      console.log(this.fileArr);
-      console.log(this.standardtime);
-      if (this.add.projiectName == "") {
-        this.base.warn(this, "请填写项目名称");
-        return;
-      }
-      if (this.add.projectId == "") {
-        this.base.warn(this, "请填写项目编号");
-        return;
-      }
-      if (this.add.projectPerson == "") {
-        this.base.warn(this, "请填写项目负责人");
-        return;
-      }
-      if (this.date == "") {
-        this.base.warn(this, "请填写时间节点");
-        return;
-      }
-      if (this.add.workProgress == "") {
-        this.base.warn(this, "请填写工作进度");
-        return;
-      }
-      if (this.add.collectionProgress == "") {
-        this.base.warn(this, "请填写收款进度");
-        return;
-      }
+      // if (this.date == "") {
+      //   this.base.warn(this, "请填写时间节点");
+      //   return;
+      // }
       if (this.add.detail == "") {
         this.base.warn(this, "请填写详细描述");
         return;
       }
-      console.log(1);
       // this.loading = true;
-
       this.add.accessory = this.fileArr.join(",");
       let params = {
-        projectNam: this.add.projectName,
-        projectNum: this.add.projectId,
-        projectLeader: this.add.projectPerson,
-        jobSchedule: this.add.workProgress,
-        collectionSchedule: this.add.collectionProgress,
+        projectName: this.add.projectName,
+        projectType: this.add.projectType,
+        principal: this.add.principal,
         detail: this.add.detail,
         date: this.standardtime,
-        pId: this.pId,
+        mId: this.id,
+        phone: this.phone,
         accessory: this.add.accessory
       };
-      this.$axios.post(this.baseurl + "/schedule/save", params).then(data => {
-        console.log(data);
+      this.$store.dispatch("add_mon_data", params).then(data => {
         this.base.suc(this, "提交成功");
-        this.getData();
-        this.add.projectName = "";
-        this.add.projectId = "";
-        this.add.projectPerson = "";
-        this.add.workProgress = "";
-        this.add.collectionProgress = "";
-        this.add.detail = "";
-        this.date = "";
-        this.add.accessory = "";
-        this.addShow = false;
-        this.fileArr = [];
       });
+      // this.getData();
+      this.add.projectName = "";
+      this.add.projectId = "";
+      this.add.projectPerson = "";
+      this.add.workProgress = "";
+      this.add.collectionProgress = "";
+      this.add.detail = "";
+      this.date = "";
+      this.add.accessory = "";
+      this.addShow = false;
+      this.fileArr = [];
     },
     // 查看文件
     fileview(v) {
-      let obj = this.data.filter(res => res.id == v);
+      let obj = this.mon_data.filter(res => res.id == v);
       let arr = obj[0].accessory.split(",");
       let arr2 = [];
       arr.forEach((v, i) => {
@@ -714,25 +630,23 @@ export default {
     updateview(v) {
       this.updateShow = true;
       this.updataId = v;
-      let obj = this.data.filter(res => res.id == v);
-      console.log(obj);
+      let obj = this.mon_data.filter(res => res.id == v);
       this.update.projectName = obj[0].projectNam;
-      this.update.projectId = obj[0].projectNum;
-      this.update.projectPerson = obj[0].projectLeader;
-      this.update.workProgress = Number(obj[0].jobSchedule);
-      this.update.collectionProgress = obj[0].collectionSchedule;
+      this.update.principal = obj[0].principal;
       this.update.detail = obj[0].detail;
+      this.update.projectType = obj[0].update;
       this.date1 = obj[0].date;
-      let arr = obj[0].accessory.split(",");
-      let arr2 = [];
-      arr.forEach((v, i) => {
-        if ((i + 1) % 2 == 0) {
-          let obj = { name: arr[i - 1], url: `${arr[i]}` };
-          arr2.push(obj);
-        }
-      });
-      console.log(this.fileList2);
-      this.fileList2 = arr2;
+      console.log(obj);
+      // let arr = obj[0].accessory.split(",");
+      // let arr2 = [];
+      // arr.forEach((v, i) => {
+      //   if ((i + 1) % 2 == 0) {
+      //     let obj = { name: arr[i - 1], url: `${arr[i]}` };
+      //     arr2.push(obj);
+      //   }
+      // });
+      // console.log(this.fileList2);
+      // this.fileList2 = arr2;
     },
     //提交更新
     sureupdata() {
@@ -771,15 +685,9 @@ export default {
         type: "warning"
       })
         .then(() => {
-          this.$axios
-            .post(this.baseurl + "/schedule/del", { id: i })
-            .then(() => {
-              this.$message({
-                type: "success",
-                message: "删除成功!"
-              });
-              this.getData();
-            });
+          this.$store.dispatch("del_mon", i).then(data => {
+            this.base.suc(this, "删除成功");
+          });
         })
         .catch(() => {
           this.$message({
@@ -790,9 +698,11 @@ export default {
     },
     //换页按钮
     changePage() {
-      let start = (this.currentPage - 1) * this.pageSize;
-      let end = this.currentPage * this.pageSize;
-      this.filterdata = this.data.slice(start, end);
+      this.month_show_data = this.base.ChangePage(
+        this.pageSize,
+        this.currentPage,
+        this.mon_data
+      );
     },
     close() {
       this.$em.$emit("closeProgress");
@@ -966,7 +876,7 @@ textarea {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  width: 200px;
+  width: 100%;
 }
 .detail::-webkit-scrollbar {
   /* height: 5px; */

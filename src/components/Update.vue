@@ -104,16 +104,17 @@
           </td>
         </tr>
         <tr>
-          <td colspan="2">时间进度和说明</td>
+          <td colspan="2">录入时间</td>
           <td colspan="2">
-            <el-date-picker
+            {{time}}
+            <!-- <el-date-picker
               v-model="time"
               type="date"
               format="yyyy 年 MM 月 dd 日"
               value-format="yyyy-MM-dd"
               placeholder="选择日期"
               @change="changetime()"
-            ></el-date-picker>
+            ></el-date-picker>-->
           </td>
           <td colspan="6">
             <el-input type="textarea" v-model="explain" placeholder="请输入说明"></el-input>
@@ -142,7 +143,7 @@
           <td colspan="5">工作大纲</td>
           <td colspan="5">
             <el-date-picker
-              v-model="Work_outline"
+              v-model="workingOutline"
               type="date"
               placeholder="选择日期"
               @change="changetime()"
@@ -153,7 +154,7 @@
           <td colspan="5">初步成果</td>
           <td colspan="5">
             <el-date-picker
-              v-model="Preliminary_success"
+              v-model="firstFruits"
               type="date"
               placeholder="选择日期"
               @change="changetime()"
@@ -164,7 +165,7 @@
           <td colspan="5">中间成果</td>
           <td colspan="5">
             <el-date-picker
-              v-model="Intermediate_results"
+              v-model="resultsAmong"
               type="date"
               placeholder="选择日期"
               @change="changetime()"
@@ -175,7 +176,7 @@
           <td colspan="5">最终成果</td>
           <td colspan="5">
             <el-date-picker
-              v-model="Final_result"
+              v-model="finalResult"
               type="date"
               placeholder="选择日期"
               @change="changetime()"
@@ -256,10 +257,14 @@ export default {
   props: ["message"],
   data() {
     return {
-      Work_outline: "", //工作大纲
-      Preliminary_success: "", //初步成果
-      Intermediate_results: "", //中间成果
-      Final_result: "", //最终成果
+      // //工作大纲
+      workingOutline: "",
+      // //初步成果 ;
+      firstFruits: "",
+      // //中间成果
+      resultsAmong: "",
+      // //最终成果
+      finalResult: "",
       province: "",
       city: "",
       area: "",
@@ -415,34 +420,22 @@ export default {
   created() {
     this.getdata();
   },
+  computed: {
+    person() {
+      return this.$store.state.person.person;
+    }
+  },
   methods: {
     // 项目负责人
     getdata() {
-      //获取负责人的数据
-      let params = { phone: this.$store.state.phone };
-      this.$axios.post(this.baseurl + "/ps/selRP", params).then(data => {
-        //展示分管负责人 data.data;
-        let arr = [];
-        data.data.forEach(v => {
-          arr.push({ value: v.person.trim() });
-        });
-        this.branchedpassageoptions = arr;
+      this.branchedpassageoptions = this.person.分管负责人.map(v => {
+        return { value: v.name };
       });
-      this.$axios.post(this.baseurl + "/ps/selPL", params).then(data => {
-        //展示项目负责人itemoptions
-        let arr = [];
-        data.data.forEach(v => {
-          arr.push({ value: v.person.trim() });
-        });
-        this.itemoptions = arr;
+      this.itemoptions = this.person.项目负责人.map(v => {
+        return { value: v.name };
       });
-      this.$axios.post(this.baseurl + "/ps/selPP", params).then(data => {
-        //展示参与人员
-        let arr = [];
-        data.data.forEach(v => {
-          arr.push({ value: v.person.trim() });
-        });
-        this.participationoptions = arr;
+      this.participationoptions = this.person.参与人员.map(v => {
+        return { value: v.name };
       });
     },
     // 导出按钮
@@ -557,11 +550,6 @@ export default {
           message: "请选择参与人员",
           type: "error"
         });
-      } else if (this.time == "") {
-        this.$message({
-          message: "请选择日期",
-          type: "error"
-        });
       } else if (this.explain == "") {
         this.$message({
           message: "请输入说明",
@@ -569,44 +557,46 @@ export default {
         });
       } else {
         this.standardtime = this.time;
-        console.log(this.standardtime);
         this.participation = this.participation.join(",");
-        this.$axios
-          .post(this.baseurl + "/ps/update", {
-            id: this.id,
-            address: this.site,
-            projectType: this.addtabletype,
-            projectNum: this.addtablenumber,
-            projectNam: this.addtablename,
-            contractSigning: this.addtableconclude,
-            contractAmount: this.contractamount,
-            collection: this.gathering,
-            collectionRatio: (this.gathering / this.contractamount).toFixed(2),
-            amountSubcontract: this.subpackage,
-            netValueOf: this.contractamount - this.subpackage,
-            bonusCoefficient: this.award,
-            distributableValue: this.ifaward,
-            performanceCertificate: this.prove,
-            responsiblePerson: this.branchedpassage,
-            projectLeader: this.item,
-            participant: this.participation,
-            date: this.standardtime,
-            schedule: this.explain,
-            questionsSuggestions: this.suggest,
-            remark: this.remark,
-            phone: this.$store.state.phone
-          })
-          .then(res => {
-            if (res.data.msg == "OK") {
-              this.$message({
-                message: "项目修改成功",
-                type: "success"
-              });
-            }
-            let arr = this.participation;
-            this.participation = arr.split(",");
-            this.$emit("up");
-          });
+        let params = {
+          id: this.id,
+          address: this.site,
+          projectType: this.addtabletype,
+          projectNum: this.addtablenumber,
+          projectNam: this.addtablename,
+          contractSigning: this.addtableconclude,
+          contractAmount: this.contractamount,
+          collection: this.gathering,
+          collectionRatio: (this.gathering / this.contractamount).toFixed(2),
+          amountSubcontract: this.subpackage,
+          netValueOf: this.contractamount - this.subpackage,
+          bonusCoefficient: this.award,
+          distributableValue: this.ifaward,
+          performanceCertificate: this.prove,
+          responsiblePerson: this.branchedpassage,
+          projectLeader: this.item,
+          participant: this.participation,
+          date: this.standardtime,
+          schedule: this.explain,
+          questionsSuggestions: this.suggest,
+          remark: this.remark,
+          phone: this.$store.state.phone,
+          workingOutline: this.workingOutline,
+          firstFruits: this.firstFruits,
+          resultsAmong: this.resultsAmong,
+          finalResult: this.finalResult
+        };
+        this.$axios.post(this.baseurl + "/ps/update", params).then(res => {
+          if (res.data.msg == "OK") {
+            this.$message({
+              message: "项目修改成功",
+              type: "success"
+            });
+          }
+          let arr = this.participation;
+          this.participation = arr.split(",");
+          this.$emit("up");
+        });
       }
     },
     change() {
@@ -644,6 +634,10 @@ export default {
           this.explain = res.data[0].schedule;
           this.suggest = res.data[0].questionsSuggestions;
           this.remark = res.data[0].remark;
+          this.workingOutline = res.data[0].workingOutline;
+          this.firstFruits = res.data[0].firstFruits;
+          this.resultsAmong = res.data[0].resultsAmong;
+          this.finalResult = res.data[0].finalResult;
         });
     }
   },
@@ -718,13 +712,7 @@ export default {
   background: #202e63 !important;
   color: gold !important;
 }
-.distpicker-address-wrapper select {
-  background: #000c3b !important;
-  border: 1px solid #6b79a8 !important;
-  border-radius: 0px !important;
-  color: white !important;
-  width: 31%;
-}
+
 .el-textarea__inner {
   padding: 0px 5px !important;
   border-radius: 0 !important;

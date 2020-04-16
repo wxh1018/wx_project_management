@@ -12,11 +12,11 @@
         <li>
           <h1>方向负责人</h1>
           <ul class="inlist">
-            <li v-for="(item, id) in ResponsiblePerson" :key="id">
-              <p>{{item.person}}</p>
+            <li v-for="(item, id) in direction" :key="id">
+              <p>{{item.name}}{{item.phone | filter_phone}}</p>
               <button @click="del(1,item.id)">删除</button>
             </li>
-            <li class="none" v-if="ResponsiblePerson.length == 0">暂无数据</li>
+            <li class="none" v-if="direction.length == 0">暂无数据</li>
           </ul>
           <button class="add" @click="add(0)">添加</button>
         </li>
@@ -24,7 +24,7 @@
           <h1>分管负责人</h1>
           <ul class="inlist">
             <li v-for="(item, id) in ResponsiblePerson" :key="id">
-              <p>{{item.person}}</p>
+              <p>{{item.name}}{{item.phone | filter_phone}}</p>
               <button @click="del(1,item.id)">删除</button>
             </li>
             <li class="none" v-if="ResponsiblePerson.length == 0">暂无数据</li>
@@ -35,7 +35,7 @@
           <h1>项目负责人</h1>
           <ul class="inlist">
             <li v-for="(item, id) in projectLeader" :key="id">
-              <p>{{item.person}}</p>
+              <p>{{item.name}}{{item.phone | filter_phone}}</p>
               <button @click="del(2,item.id)">删除</button>
             </li>
             <li class="none" v-if="projectLeader.length == 0">暂无数据</li>
@@ -46,7 +46,7 @@
           <h1>参与人员</h1>
           <ul class="inlist">
             <li v-for="(item, id) in participant" :key="id">
-              <p>{{item.person}}</p>
+              <p>{{item.name}}{{item.phone | filter_phone}}</p>
               <button @click="del(3,item.id)">删除</button>
             </li>
             <li class="none" v-if="participant.length == 0">暂无数据</li>
@@ -82,114 +82,64 @@ export default {
     };
   },
   components: {},
-  computed: {},
-  watch: {},
+  computed: {
+    uId() {
+      return this.$store.state.root.uId;
+    }
+  },
+  watch: {
+    isshow(v) {
+      if (!v) {
+        this.iptvalue = "";
+        this.iptphone = "";
+      }
+    }
+  },
   created() {
     this.getdata();
-    this.$store.commit('set_active','Personal')
+    this.$store.commit("set_active", "Personal");
   },
   mounted() {},
+  filters: {
+    filter_phone(v) {
+      return "_" + v;
+    }
+  },
   methods: {
     getdata() {
-      let params = { phone: this.$store.state.phone };
-      this.$axios.post(this.baseurl + "/ps/selRP", params).then(data => {
-        this.ResponsiblePerson = data.data;
-        console.log(1, data.data);
-      });
-      this.$axios.post(this.baseurl + "/ps/selPL", params).then(data => {
-        this.projectLeader = data.data;
-        console.log(2, data.data);
-      });
-      this.$axios.post(this.baseurl + "/ps/selPP", params).then(data => {
-        this.participant = data.data;
+      let params = { uId: this.uId };
+      this.$axios.post(this.baseurl + "/manage/findAll", params).then(data => {
+        this.$store.commit('set_person',data.data)
+        this.direction = data.data.方向负责人;
+        this.ResponsiblePerson = data.data.分管负责人;
+        this.projectLeader = data.data.项目负责人;
+        this.participant = data.data.参与人员;
       });
     },
     del(a, b) {
       let params = { id: b };
-      if (a == 1) {
-        let obj = this.ResponsiblePerson.filter(v => v.id == b)[0];
-
-        this.$confirm(`此操作将删除<${obj.person}>负责人, 是否继续?`, "提示", {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "warning"
-        })
-          .then(() => {
-            this.$axios
-              .post(this.baseurl + "/ResponsiblePerson/delPerson", params)
-              .then(() => {
-                this.$message({
-                  type: "success",
-                  message: `已删除分管负责人${obj.person}`
-                });
-                let index = this.ResponsiblePerson.indexOf(obj); //删除的索引
-                this.ResponsiblePerson.splice(index, 1);
+      this.$confirm(`此操作将删除负责人, 是否继续?`, "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      })
+        .then(() => {
+          this.$axios
+            .post(this.baseurl + "/manage/delManage", params)
+            .then(() => {
+              this.$message({
+                type: "success",
+                message: `已删除负责人`
               });
-          })
-          .catch(() => {
-            this.$message({
-              type: "info",
-              message: "已取消删除"
+              this.getdata();
             });
-          });
-
-        return;
-      }
-      if (a == 2) {
-        let obj = this.projectLeader.filter(v => v.id == b)[0];
-        this.$confirm(`此操作将删除<${obj.person}>负责人, 是否继续?`, "提示", {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "warning"
         })
-          .then(() => {
-            this.$axios
-              .post(this.baseurl + "/projectLeader/delPerson", params)
-              .then(() => {
-                this.$message({
-                  type: "success",
-                  message: `已删除项目负责人${obj.person}`
-                });
-                let index = this.projectLeader.indexOf(obj); //删除的索引
-                this.projectLeader.splice(index, 1);
-              });
-          })
-          .catch(() => {
-            this.$message({
-              type: "info",
-              message: "已取消删除"
-            });
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "已取消删除"
           });
-        return;
-      }
-      if (a == 3) {
-        let obj = this.participant.filter(v => v.id == b)[0];
-        console.log(obj);
-        this.$confirm(`此操作将删除<${obj.person}>负责人, 是否继续?`, "提示", {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "warning"
-        })
-          .then(() => {
-            this.$axios
-              .post(this.baseurl + "/participant/delPerson", params)
-              .then(() => {
-                this.$message({
-                  type: "success",
-                  message: `已删除参与人员${obj.person}`
-                });
-                let index = this.participant.indexOf(obj); //删除的索引
-                this.participant.splice(index, 1);
-              });
-          })
-          .catch(() => {
-            this.$message({
-              type: "info",
-              message: "已取消删除"
-            });
-          });
-        return;
-      }
+        });
     },
     add(i) {
       this.isshow = !this.isshow;
@@ -209,50 +159,28 @@ export default {
     },
     //确认添加
     sure() {
-      let params = { person: this.iptvalue, phone: this.$store.state.phone };
+      let params = {
+        grade: this.title,
+        name: this.iptvalue,
+        phone: this.iptphone,
+        uId: this.uId
+      };
       if (this.iptvalue == "") {
         this.tip(`请输入${this.title}`);
         return;
       }
       //判断手机号
-      if(!this.regular.phone(this, this.iptphone))return;
-
-      if (this.content == 1) {
-        //分管
-        this.$axios
-          .post(this.baseurl + "/ResponsiblePerson/addPerson", params)
-          .then(() => {
-            this.$message({ type: "success", message: "分管负责人添加成功" });
-            this.isshow = false;
-            this.getdata();
-            this.iptvalue = "";
-          });
-      } else if (this.content == 2) {
-        //项目
-        this.$axios
-          .post(this.baseurl + "/projectLeader/addProjectLeader", params)
-          .then(data => {
-            console.log(data);
-            this.$message({ type: "success", message: "项目负责人添加成功" });
-            this.isshow = false;
-            this.getdata();
-            this.iptvalue = "";
-          });
-      } else if (this.content == 0) {
-        //反向负责人
-        console.log("方向负责人");
-      } else {
-        //参与人员
-        this.$axios
-          .post(this.baseurl + "/participant/addPerson", params)
-          .then(data => {
-            console.log(data);
-            this.$message({ type: "success", message: "参与人员添加成功" });
-            this.isshow = false;
-            this.getdata();
-            this.iptvalue = "";
-          });
-      }
+      if (!this.regular.phone(this, this.iptphone)) return;
+      //分管
+      this.$axios
+        .post(this.baseurl + "/manage/addManage", params)
+        .then(data => {
+          console.log(data);
+          this.$message({ type: "success", message: this.title + "添加成功" });
+          this.isshow = false;
+          this.getdata();
+          this.iptvalue = "";
+        });
     },
     tip(v) {
       this.$message({ type: "error", message: v });
@@ -289,14 +217,13 @@ main {
   margin-top: 10px;
 }
 .list > li {
-  width: 30%;
+  width: 24%;
   height: 100%;
   /* border: 1px solid red; */
   position: relative;
-  border-right: 1px dashed white;
 }
-.list > li:nth-last-child(1){
-  border:none
+.list > li:nth-last-child(1) {
+  border: none;
 }
 .list > li h1 {
   font-size: 20px;
@@ -307,9 +234,19 @@ main {
   padding-top: 10px;
   width: 100%;
   height: 88%;
-  display: flex;
+  /* display: flex;
   flex-flow: column;
-  align-items: center;
+  align-items: center; */
+  overflow: auto;
+}
+.inlist::-webkit-scrollbar {
+  background: white;
+  width: 5px;
+}
+.inlist::-webkit-scrollbar-thumb {
+  width: 5px;
+  background: #354892;
+  border-radius: 10px;
 }
 .inlist li {
   width: 88%;
@@ -323,13 +260,13 @@ main {
   color: white;
   border: 1px solid white;
   height: 80%;
-  width: 66%;
+  width: 70%;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 .inlist li button {
-  width: 20%;
+  width: 25%;
   height: 80%;
   font-size: 16px;
   background: rgba(34, 48, 103);
