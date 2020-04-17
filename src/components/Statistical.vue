@@ -11,15 +11,15 @@
     <div class="Statisticalmain">
       <div class="each">
         <div class="left">
-          <el-select v-model="value1" class="clec1" placeholder="人员名称">
+          <!-- <el-select v-model="value1" class="clec1" placeholder="人员名称">
             <el-option v-for="item in personData" :key="item.value" :value="item.value"></el-option>
-          </el-select>
+          </el-select>-->
           <div id="leftech"></div>
         </div>
         <div class="right">
-          <el-select v-model="value2" class="clec1" placeholder="项目名称">
+          <!-- <el-select v-model="value2" class="clec1" placeholder="项目名称">
             <el-option v-for="item in projectData" :key="item.value" :value="item.value"></el-option>
-          </el-select>
+          </el-select>-->
           <div id="rightech"></div>
         </div>
       </div>
@@ -28,6 +28,7 @@
         <div id="map2"></div>
       </div>
     </div>
+    <div class="bottom"></div>
   </div>
 </template>
 <script type="text/javascript" src="https://webapi.amap.com/maps?v=1.4.15&key=3979bd1efdf1182fb532b2b6ad46a8f0&plugin=AMap.Geocoder"></script>
@@ -52,13 +53,21 @@ export default {
   created() {
     this.$store.commit("set_active", "Statistical");
     this.getData();
+    this.$store.dispatch("get_pro_data");
   },
   mounted() {
-    this.leftEch();
-    this.rightEach();
+    // this.leftEch();
+    // this.rightEach();
     this.creatmap();
   },
-  computed: {},
+  computed: {
+    TotalData() {
+      return this.$store.state.pro_data;
+    },
+    pro_type() {
+      return this.$store.state.pro_type;
+    }
+  },
   watch: {
     value1(v) {
       this.leftproName = [];
@@ -68,19 +77,45 @@ export default {
         this.leftproName.push(v.projectNam);
         this.bili.push(v.distributionRatio);
       });
-      this.leftEch();
+      // this.leftEch();
     },
     value2(v) {
       this.value = [];
       let obj = this.Totaldata.filter(res => res.projectNam == v);
-      console.log(obj);
       obj.forEach(v => {
         this.value.push({
           value: v.distributionRatio,
           name: v.personnel
         });
       });
-      this.rightEach();
+      // this.rightEach();
+    },
+    TotalData(v) {
+      let city = v.map(v => {
+        let index = v.address.indexOf("市");
+        let ci = v.address.substring(index - 2, index + 1);
+        return ci;
+      });
+      city = [...new Set(city)];
+      //每个城市项目的数量
+      const value = () => {
+        let arr = [];
+        city.forEach(n => {
+          let length = v.filter(r => {
+            let index = r.address.indexOf("市");
+            let ci = r.address.substring(index - 2, index + 1);
+            return ci == n;
+          }).length;
+          arr.push(length);
+        });
+        return arr;
+      };
+      let totalArr = []
+      totalArr
+    },
+    pro_type(v) {
+      this.type();
+      this.area();
     }
   },
   methods: {
@@ -112,6 +147,22 @@ export default {
           this.value1 = this.personData[0].value;
           this.value2 = this.projectData[0].value;
         });
+    },
+    //项目类型
+    type() {
+      var myChart = this.$ech.init(document.getElementById("leftech"));
+      this.echar.bing(myChart, this.pro_type, "项目占比", "项目类型占比");
+    },
+    area() {
+      var myChart = this.$ech.init(document.getElementById("rightech"));
+      // let obj = {dom:myChart,datax,value,x_text:'城市名称',y_text:'项目名称',}
+      this.echar.zhu(
+        myChart,
+        [1, 2, 3],
+        [20, 30, 40],
+        "项目占比",
+        "项目地区统计"
+      );
     },
     leftEch() {
       let data = [];
@@ -146,9 +197,9 @@ export default {
         ]
       });
       var option = {
-        // title: {
-        //   text: "ECharts 入门示例"
-        // },
+        title: {
+          text: "项目"
+        },
         tooltip: {
           trigger: "axis",
           axisPointer: {
@@ -166,7 +217,6 @@ export default {
             color: "#fff"
           }
         },
-
         xAxis: {
           data: this.leftproName,
           name: "项目名称",
@@ -313,7 +363,6 @@ export default {
       let markerContent = [];
       let lnglats = [];
       this.geoCoordMap.forEach(v => {
-        console.log(v);
         markerContent.push(
           `<div class="custom-content-marker"><span>${v.name}</span><div class="jiantou"></div></div>`
         );
@@ -341,6 +390,21 @@ export default {
   width: 100%;
   height: 100%;
   box-shadow: 0px 0px 5px #283879;
+  overflow: auto;
+}
+.Statistical::-webkit-scrollbar {
+  width: 10px;
+  background: white;
+}
+.Statistical::-webkit-scrollbar-thumb {
+  width: 10px;
+  background: #283879;
+}
+.bottom {
+  height: 500px;
+  width: 100%;
+  border: 1px solid red;
+  box-sizing: border-box;
 }
 .mianbao {
   width: 100%;
@@ -365,13 +429,12 @@ export default {
   padding-left: 30px;
   box-sizing: border-box;
   width: 100%;
-  height: 37%;
+  height: 50%;
 }
 #leftech,
 #rightech {
   width: 100%;
   height: 100%;
-  /* border: 1px solid red; */
 }
 .each {
   flex: 1;
@@ -381,7 +444,7 @@ export default {
   justify-content: space-around;
 }
 #map1 {
-  flex: 1.5;
+  flex: 1.2;
   width: 100%;
   height: 90%;
 }

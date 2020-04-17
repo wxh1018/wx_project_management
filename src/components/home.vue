@@ -31,13 +31,13 @@
                   <el-menu-item index="allocation">
                     <i class="el-icon-menu"></i>产值分配
                   </el-menu-item>
-                  <el-menu-item index="Statistical">
+                  <el-menu-item v-show="grade_show" index="Statistical">
                     <i class="el-icon-s-data"></i>统计分析
                   </el-menu-item>
-                  <el-menu-item index="market">
+                  <el-menu-item v-show="grade_show" index="market">
                     <i class="el-icon-monitor"></i>市场跟踪
                   </el-menu-item>
-                  <el-menu-item index="Personal">
+                  <el-menu-item v-show="grade_show" index="Personal">
                     <i class="el-icon-user-solid"></i>个人中心
                   </el-menu-item>
                 </el-menu-item-group>
@@ -65,8 +65,16 @@
 export default {
   data() {
     return {
-      usernamer: ""
+      usernamer: "",
+      grade_show: false
     };
+  },
+  created() {
+    if (this.$store.state.root.grade == 1) {
+      this.grade_show = true;
+    } else {
+      this.grade_show = false;
+    }
   },
   computed: {
     active() {

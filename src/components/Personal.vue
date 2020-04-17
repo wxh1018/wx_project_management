@@ -102,7 +102,7 @@ export default {
   mounted() {},
   filters: {
     filter_phone(v) {
-      return "_" + v;
+      return "—" + v;
     }
   },
   methods: {

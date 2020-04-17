@@ -97,10 +97,7 @@ export default {
           phone: this.phone
         })
         .then(data => {
-          this.$axios.post(this.baseurl+'/manage/selPhone',{ phone: this.phone}).then(data=>{
-            console.log(data);
-            this.$store.commit('set_user_msg',data.data[0])
-          })
+
           this.$message({
             message: "登陆成功！ 尊敬的" + this.phone + "用户",
             type: "success"

@@ -94,7 +94,6 @@
           </td>
           <td>时间节点</td>
           <td>
-            <!-- <el-date-picker v-model="date" type="date" placeholder="选择日期" @change="changetime()"></el-date-picker> -->
             <el-date-picker
               v-model="date"
               type="date"
@@ -147,18 +146,18 @@
           <td>项目名称</td>
           <td>
             <!-- <input v-model="add.projectName" type="text" /> -->
-            <p>{{add.projectName}}</p>
+            <p>{{update.projectName}}</p>
           </td>
           <td>项目类型</td>
           <td>
             <!-- <input type="text" v-model="add.projectId" /> -->
-            <p>{{add.projectType}}</p>
+            <p>{{update.projectType}}</p>
           </td>
         </tr>
         <tr>
           <td>项目负责人</td>
           <td>
-            <p>{{add.principal}}</p>
+            <p>{{update.principal}}</p>
           </td>
           <td>时间节点</td>
           <td>
@@ -391,7 +390,8 @@ export default {
       fileArr2: [],
       updataId: "", //更新项目id
       file: "", //查看附件文件
-      fileshow: false //显示附件
+      fileshow: false, //显示附件
+
     };
   },
   components: {},
@@ -571,10 +571,10 @@ export default {
     },
     //添加项目
     sureadd() {
-      // if (this.date == "") {
-      //   this.base.warn(this, "请填写时间节点");
-      //   return;
-      // }
+      if (this.date == "") {
+        this.base.warn(this, "请填写时间节点");
+        return;
+      }
       if (this.add.detail == "") {
         this.base.warn(this, "请填写详细描述");
         return;
@@ -586,15 +586,15 @@ export default {
         projectType: this.add.projectType,
         principal: this.add.principal,
         detail: this.add.detail,
-        date: this.standardtime,
+        date: this.date,
         mId: this.id,
         phone: this.phone,
         accessory: this.add.accessory
       };
+      console.log(params);
       this.$store.dispatch("add_mon_data", params).then(data => {
         this.base.suc(this, "提交成功");
       });
-      // this.getData();
       this.add.projectName = "";
       this.add.projectId = "";
       this.add.projectPerson = "";
@@ -631,49 +631,43 @@ export default {
       this.updateShow = true;
       this.updataId = v;
       let obj = this.mon_data.filter(res => res.id == v);
-      this.update.projectName = obj[0].projectNam;
+      this.update.projectName = obj[0].projectName;
       this.update.principal = obj[0].principal;
       this.update.detail = obj[0].detail;
-      this.update.projectType = obj[0].update;
+      this.update.projectType = obj[0].projectType;
       this.date1 = obj[0].date;
-      console.log(obj);
-      // let arr = obj[0].accessory.split(",");
-      // let arr2 = [];
-      // arr.forEach((v, i) => {
-      //   if ((i + 1) % 2 == 0) {
-      //     let obj = { name: arr[i - 1], url: `${arr[i]}` };
-      //     arr2.push(obj);
-      //   }
-      // });
-      // console.log(this.fileList2);
-      // this.fileList2 = arr2;
+      let arr = obj[0].accessory.split(",");
+      let arr2 = [];
+      arr.forEach((v, i) => {
+        if ((i + 1) % 2 == 0) {
+          let obj = { name: arr[i - 1], url: `${arr[i]}` };
+          arr2.push(obj);
+        }
+      });
+      this.fileList2 = arr2;
     },
     //提交更新
     sureupdata() {
-      // this.updateview();
-      console.log(this.fileList2);
+      console.log(this.update);
       let arr = [];
       this.fileList2.forEach(v => {
         arr.push(v.name);
         arr.push(v.url);
       });
       this.update.accessory = arr.join(",");
-      console.log(this.update.accessory);
       let params = {
-        id: this.updataId,
-        projectNam: this.update.projectName,
-        projectNum: this.update.projectId,
-        projectLeader: this.update.projectPerson,
-        jobSchedule: this.update.workProgress,
-        collectionSchedule: this.update.collectionProgress,
+        projectName: this.update.projectName,
+        principal: this.update.principal,
         detail: this.update.detail,
+        projectType: this.update.projectType,
         date: this.date1,
-        accessory: this.update.accessory
+        accessory: this.update.accessory,
+        mId: this.id,
+        id: this.updataId
       };
-      this.$axios.post(this.baseurl + "/schedule/update", params).then(() => {
-        this.base.suc(this, "更新成功");
-        this.updateShow = false;
-        this.getData();
+      this.$store.dispatch("update_mon", params).then(data => {
+        console.log(data);
+        this.base.suc(this, "数据更新成功");
       });
     },
     //删除
@@ -685,7 +679,7 @@ export default {
         type: "warning"
       })
         .then(() => {
-          this.$store.dispatch("del_mon", i).then(data => {
+          this.$store.dispatch("del_mon", { id: i }).then(data => {
             this.base.suc(this, "删除成功");
           });
         })

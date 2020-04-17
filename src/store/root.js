@@ -2,7 +2,8 @@ import * as Api from '../api/market'
 const market = {
     state: {
         user_msg: '',
-        uId: ''
+        uId: '',
+        grade: ''
     },
     getters: {},
     mutations: {
@@ -13,6 +14,9 @@ const market = {
             msg.uId == 0 ? (uId = msg.id) : (uId = msg.uId);
             state.uId = uId
         },
+        set_grade(state, v) {
+            state.grade = v
+        }
     },
     actions: {
 

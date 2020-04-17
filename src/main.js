@@ -12,8 +12,10 @@ Vue.prototype.$em = em
 Vue.prototype.$ech = echarts
 import base from './until/base'
 import Regular from './until/Regular'
+import echar from './until/echarts'
 Vue.prototype.base = base
 Vue.prototype.regular = Regular
+Vue.prototype.echar = echar
 
 Vue.prototype.$axios =axios;
 Vue.component('v-distpicker', VDistpicker)

@@ -15,10 +15,14 @@ export default {
           color: #fff !important;
           border: 1px solid #000c3b !important;
       }`);
+    this.root();
   },
   computed: {
     uId() {
       return this.$store.state.root.uId;
+    },
+    phone() {
+      return this.$store.state.phone;
     }
   },
   methods: {
@@ -26,7 +30,7 @@ export default {
     person() {
       let params = { uId: this.uId };
       this.$axios.post(this.baseurl + "/manage/findAll", params).then(data => {
-        this.$store.commit('set_person',data.data)
+        this.$store.commit("set_person", data.data);
         // this.direction = data.data.方向负责人;
         // this.ResponsiblePerson = data.data.分管负责人;
         // this.projectLeader = data.data.项目负责人;
@@ -51,6 +55,21 @@ export default {
       window.addEventListener("beforeunload", () => {
         sessionStorage.setItem("store", JSON.stringify(this.$store.state));
       });
+    },
+    root() {
+      this.$axios
+        .post(this.baseurl + "/manage/selPhone", { phone: this.phone })
+        .then(data => {
+          let str = data.data[0].grade.trim();
+          let fg =
+            str == "方向负责人" || str == "分管负责人" || str == "项目负责人";
+          if (fg) {
+            this.$store.commit("set_grade", 1);
+          } else {
+            this.$store.commit("set_grade", 2);
+          }
+          this.$store.commit("set_user_msg", data.data[0]);
+        });
     }
   }
 };
@@ -119,8 +138,5 @@ export default {
   margin-right: -55px;
   -webkit-box-sizing: border-box;
   box-sizing: border-box;
-}
-.schedule_add {
-  z-index: 9999 !important;
 }
 </style>

@@ -55,9 +55,16 @@ const market = {
             })
         },
         //月报删除
-        del_mon({dispatch},params){
-            Api.del_mon(params).then(data=>{
+        del_mon({ dispatch }, params) {
+            Api.del_mon(params).then(data => {
                 dispatch('get_mon_data')
+            })
+        },
+        update_mon({ dispatch }, params) {
+            return Api.modify_mon(params).then(data => {
+                console.log(data);
+                dispatch('get_mon_data')
+                return true
             })
         }
     }
