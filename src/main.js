@@ -17,28 +17,29 @@ Vue.prototype.base = base
 Vue.prototype.regular = Regular
 Vue.prototype.echar = echar
 
-Vue.prototype.$axios =axios;
+Vue.prototype.$axios = axios;
 Vue.component('v-distpicker', VDistpicker)
 Vue.use(ElementUI);
 Vue.config.productionTip = false
-window.router=router
-Vue.prototype.baseurl = 'http://www.free-http.svipss.top'
+window.router = router
+Vue.prototype.baseurl = 'http://119.3.210.185:8921'
+// Vue.prototype.baseurl = 'http://www.free-http.svipss.top'
 router.beforeEach((to, from, next) => {
-  let token = localStorage.getItem("phone") || "";
-  if(token){
+  let token = localStorage.getItem("phone1") || "";
+  if (token) {
     next()
-  }else{
-    if(to.path!=='/login'){
-      if(to.path=='/'){
+  } else {
+    if (to.path !== '/login') {
+      if (to.path == '/') {
         next()
-      }else{
-        next({path:'/login'})
+      } else {
+        next({ path: '/login' })
       }
-    }else{
+    } else {
       next()
     }
   }
- 
+
 })
 
 

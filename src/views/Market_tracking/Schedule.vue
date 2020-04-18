@@ -112,7 +112,7 @@
           <td>
             <el-upload
               class="upload-demo"
-              action="http://119.3.210.185:8921/upload/add"
+              :action="upload_add"
               :on-preview="handlePreview"
               :on-remove="handleRemove"
               :on-success="handsuccess"
@@ -180,7 +180,7 @@
           <td>
             <el-upload
               class="upload-demo"
-              action="http://119.3.210.185:8921/upload/add"
+              :action="upload_add"
               :on-preview="handlePreview2"
               :on-remove="handleRemove2"
               :on-success="handsuccess2"
@@ -211,7 +211,7 @@
     <!-- 查看附件 -->
     <el-dialog :visible.sync="fileshow" append-to-body>
       <div class="fileshow">
-        <p v-if="fileList2.length == 0" class="nofile">暂无附件</p>
+        <p v-if="file.length == 0" class="nofile">暂无附件</p>
         <ul class="showfiles">
           <li v-for="(item, id) in file" :key="id">
             <p>文件名：{{item.name}}</p>
@@ -390,12 +390,14 @@ export default {
       fileArr2: [],
       updataId: "", //更新项目id
       file: "", //查看附件文件
-      fileshow: false, //显示附件
-
+      fileshow: false //显示附件
     };
   },
   components: {},
   computed: {
+    upload_add() {
+      return this.baseurl + "/upload/add";
+    },
     pid() {
       return this.$store.state.pId;
     },
@@ -595,11 +597,6 @@ export default {
       this.$store.dispatch("add_mon_data", params).then(data => {
         this.base.suc(this, "提交成功");
       });
-      this.add.projectName = "";
-      this.add.projectId = "";
-      this.add.projectPerson = "";
-      this.add.workProgress = "";
-      this.add.collectionProgress = "";
       this.add.detail = "";
       this.date = "";
       this.add.accessory = "";
@@ -619,6 +616,9 @@ export default {
         }
       });
       console.log(arr2);
+      if (arr2.length == 0) {
+        this.base.noti(this, "暂无附件");
+      }
       this.file = arr2;
       this.fileshow = true;
     },
@@ -667,7 +667,12 @@ export default {
       };
       this.$store.dispatch("update_mon", params).then(data => {
         console.log(data);
-        this.base.suc(this, "数据更新成功");
+        if (data == "数据修改失败！") {
+          this.base.warn(this, data);
+        } else {
+          this.base.suc(this, data);
+        }
+        this.updateShow = false;
       });
     },
     //删除

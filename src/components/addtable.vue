@@ -425,7 +425,6 @@ export default {
       this.participationoptions = this.person.参与人员.map(v => {
         return { value: v.name };
       });
-
     },
     // 选择地区
     onChangeselected(a) {
@@ -456,122 +455,136 @@ export default {
         this.ifaward = (this.contractamount - this.subpackage) * this.award;
       }
 
-      // if (this.site == "") {
-      //   this.$message({
-      //     message: "请选择项目地区",
-      //     type: "error"
-      //   });
-      // } else if (this.addtabletype == "") {
-      //   this.$message({
-      //     message: "请选择项目类型",
-      //     type: "error"
-      //   });
-      // } else if (this.addtablenumber == "") {
-      //   this.$message({
-      //     message: "请输入项目编号",
-      //     type: "error"
-      //   });
-      // } else if (this.addtablename == "") {
-      //   this.$message({
-      //     message: "请输入项目名称",
-      //     type: "error"
-      //   });
-      // } else if (this.addtableconclude == "") {
-      //   this.$message({
-      //     message: "请选择合同签订情况",
-      //     type: "error"
-      //   });
-      // } else if (this.contractamount == "") {
-      //   this.$message({
-      //     message: "请输入合同额",
-      //     type: "error"
-      //   });
-      // } else if (this.gathering == "") {
-      //   this.$message({
-      //     message: "请输入收款",
-      //     type: "error"
-      //   });
-      // } else if (this.subpackage == "") {
-      //   this.$message({
-      //     message: "请输入分包合同额",
-      //     type: "error"
-      //   });
-      // } else if (this.prove == "") {
-      //   this.$message({
-      //     message: "请选择履历证明或节点证明",
-      //     type: "error"
-      //   });
-      // } else if (this.branchedpassage == "") {
-      //   this.$message({
-      //     message: "请选择分管负责人",
-      //     type: "error"
-      //   });
-      // } else if (this.item == "") {
-      //   this.$message({
-      //     message: "请选择项目负责人",
-      //     type: "error"
-      //   });
-      // } else if (this.participation == "") {
-      //   this.$message({
-      //     message: "请选择参与人员",
-      //     type: "error"
-      //   });
-      // } else if (this.explain == "") {
-      //   this.$message({
-      //     message: "请输入说明",
-      //     type: "error"
-      //   });
-      // } else {
-      // if(typeof(this.participation))
-      console.log(this.participation);
-      if (typeof this.participation != "string") {
-        let arr = this.participation.join(",");
-        this.participation = arr;
-      }
-      this.$axios
-        .post(this.baseurl + "/ps/saveProject", {
-          address: this.site,
-          projectType: this.addtabletype,
-          projectNum: this.addtablenumber,
-          projectNam: this.addtablename,
-          contractSigning: this.addtableconclude,
-          contractAmount: this.contractamount,
-          collection: this.gathering,
-          collectionRatio: (this.gathering / this.contractamount).toFixed(2),
-          amountSubcontract: this.subpackage,
-          netValueOf: this.contractamount - this.subpackage,
-          bonusCoefficient: this.award,
-          distributableValue: this.ifaward,
-          performanceCertificate: this.prove,
-          responsiblePerson: this.branchedpassage,
-          projectLeader: this.item,
-          participant: this.participation,
-          date: this.standardtime,
-          schedule: this.explain,
-          questionsSuggestions: this.suggest,
-          remark: this.remark,
-          phone: this.$store.state.phone,
-          workingOutline: this.workingOutline,
-          firstFruits: this.firstFruits,
-          resultsAmong: this.resultsAmong,
-          finalResult: this.finalResult
-        })
-        .then(res => {
-          console.log(res);
-          if (res.data.msg == "保存成功") {
-            this.$message({
-              message: "项目提交成功",
-              type: "success"
-            });
-            this.participation = [];
-            this.$emit("clo");
-            //   setTimeout(function() {
-
-            //     // location.reload();
-            //   }, 1000);
-          }
+      if (this.site == "") {
+        this.$message({
+          message: "请选择项目地区",
+          type: "error"
         });
-      // }
+      } else if (this.addtabletype == "") {
+        this.$message({
+          message: "请选择项目类型",
+          type: "error"
+        });
+      } else if (this.addtablenumber == "") {
+        this.$message({
+          message: "请输入项目编号",
+          type: "error"
+        });
+      } else if (this.addtablename == "") {
+        this.$message({
+          message: "请输入项目名称",
+          type: "error"
+        });
+      } else if (this.addtableconclude == "") {
+        this.$message({
+          message: "请选择合同签订情况",
+          type: "error"
+        });
+      } else if (this.contractamount == "") {
+        this.$message({
+          message: "请输入合同额",
+          type: "error"
+        });
+      } else if (this.gathering == "") {
+        this.$message({
+          message: "请输入收款",
+          type: "error"
+        });
+      } else if (this.subpackage == "") {
+        this.$message({
+          message: "请输入分包合同额",
+          type: "error"
+        });
+      } else if (this.prove == "") {
+        this.$message({
+          message: "请选择履历证明或节点证明",
+          type: "error"
+        });
+      } else if (this.branchedpassage == "") {
+        this.$message({
+          message: "请选择分管负责人",
+          type: "error"
+        });
+      } else if (this.item == "") {
+        this.$message({
+          message: "请选择项目负责人",
+          type: "error"
+        });
+      } else if (this.participation == "") {
+        this.$message({
+          message: "请选择参与人员",
+          type: "error"
+        });
+      } else {
+        // if(typeof(this.participation))
+        console.log(this.participation);
+        if (typeof this.participation != "string") {
+          let arr = this.participation.join(",");
+          this.participation = arr;
+        }
+        this.$axios
+          .post(this.baseurl + "/ps/saveProject", {
+            address: this.site,
+            projectType: this.addtabletype,
+            projectNum: this.addtablenumber,
+            projectNam: this.addtablename,
+            contractSigning: this.addtableconclude,
+            contractAmount: this.contractamount,
+            collection: this.gathering,
+            collectionRatio: (this.gathering / this.contractamount).toFixed(2),
+            amountSubcontract: this.subpackage,
+            netValueOf: this.contractamount - this.subpackage,
+            bonusCoefficient: this.award,
+            distributableValue: this.ifaward,
+            performanceCertificate: this.prove,
+            responsiblePerson: this.branchedpassage,
+            projectLeader: this.item,
+            participant: this.participation,
+            date: this.standardtime,
+            schedule: this.explain,
+            questionsSuggestions: this.suggest,
+            remark: this.remark,
+            phone: this.$store.state.phone,
+            workingOutline: this.workingOutline,
+            firstFruits: this.firstFruits,
+            resultsAmong: this.resultsAmong,
+            finalResult: this.finalResult
+          })
+          .then(res => {
+            console.log(res);
+            if (res.data.msg == "保存成功") {
+              this.$message({
+                message: "项目提交成功",
+                type: "success"
+              });
+              this.participation = [];
+              this.workingOutline = "";
+              this.firstFruits = "";
+              this.resultsAmong = "";
+              this.finalResult = "";
+              this.site = "";
+              this.addtabletype = "";
+              this.addtablenumber = "";
+              this.addtablename = "";
+              this.addtableconclude = "";
+              this.contractamount = "";
+              this.gathering = "";
+              this.subpackage = "";
+              this.award = "";
+              this.awarddata = "";
+              this.prove = "";
+              this.branchedpassage = "";
+              this.item = "";
+              this.participation = "";
+              this.explain = "";
+              this.suggest = "";
+              this.remark = "";
+              this.standardtime = "";
+              this.ifaward = "";
+              this.$emit("clo");
+            }
+          });
+      }
     },
     // 导出按钮
     derive() {

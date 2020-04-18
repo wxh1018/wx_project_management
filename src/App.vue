@@ -5,73 +5,21 @@
 </template>
 <script>
 export default {
+  data() {
+    return {
+      uId: ""
+    };
+  },
   created() {
-    this.resh();
-    this.person();
-    this.$store.commit("setPhone", localStorage.phone);
-    this.base.AddStyle(`
-      .el-input__inner {
-          background: none !important;
-          color: #fff !important;
-          border: 1px solid #000c3b !important;
-      }`);
-    this.root();
-  },
-  computed: {
-    uId() {
-      return this.$store.state.root.uId;
-    },
-    phone() {
-      return this.$store.state.phone;
+    // this.resh();
+    if (!localStorage.phone1) {
+      this.$router.push("/login");
+    }else{
+      this.$router.push("/");
     }
   },
-  methods: {
-    // 人员
-    person() {
-      let params = { uId: this.uId };
-      this.$axios.post(this.baseurl + "/manage/findAll", params).then(data => {
-        this.$store.commit("set_person", data.data);
-        // this.direction = data.data.方向负责人;
-        // this.ResponsiblePerson = data.data.分管负责人;
-        // this.projectLeader = data.data.项目负责人;
-        // this.participant = data.data.参与人员;
-        // console.log(this.direction);
-      });
-    },
-    resh() {
-      //在页面加载时读取sessionStorage里的状态信息
-      if (sessionStorage.getItem("store")) {
-        this.$store.replaceState(
-          Object.assign(
-            {},
-            this.$store.state,
-            JSON.parse(sessionStorage.getItem("store"))
-          )
-        );
-        sessionStorage.removeItem("store");
-      }
-
-      //在页面刷新时将vuex里的信息保存到sessionStorage里
-      window.addEventListener("beforeunload", () => {
-        sessionStorage.setItem("store", JSON.stringify(this.$store.state));
-      });
-    },
-    root() {
-      this.$axios
-        .post(this.baseurl + "/manage/selPhone", { phone: this.phone })
-        .then(data => {
-          let str = data.data[0].grade.trim();
-          let fg =
-            str == "方向负责人" || str == "分管负责人" || str == "项目负责人";
-          if (fg) {
-            this.$store.commit("set_grade", 1);
-          } else {
-            this.$store.commit("set_grade", 2);
-          }
-          this.$store.commit("set_user_msg", data.data[0]);
-        });
-    }
-  }
+  computed: {},
+  methods: {}
 };
 </script>
 <style>

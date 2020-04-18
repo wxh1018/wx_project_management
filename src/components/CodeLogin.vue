@@ -46,8 +46,9 @@ export default {
     };
   },
   mounted() {
-    let phone = localStorage.getItem("phone");
+    let phone = localStorage.getItem("phone1");
     if (phone) {
+      console.log(1);
       this.$router.push("/project");
     }
   },
@@ -61,35 +62,35 @@ export default {
         return;
       }
       //超级管理员
-      if (this.code == this.$store.state.superpwd) {
+      if (this.code == 88888888) {
         if (!this.phoneFg(this.phone)) {
           return;
-        } 
-        this.tologin()
+        }
+        this.tologin();
         return;
       }
       if (this.code == "") {
-        // this.$message({
-        //   message: "请输入验证码",
-        //   type: "error"
-        // });
-        // return;
+        this.$message({
+          message: "请输入验证码",
+          type: "error"
+        });
+        return;
       }
       if (this.code != this.truecode) {
-        // this.$message({
-        //   message: "验证码有误，请检查！",
-        //   type: "error"
-        // });
-        // return;
+        this.$message({
+          message: "验证码有误，请检查！",
+          type: "error"
+        });
+        return;
       }
       if (this.phone != this.truePhone) {
-        // this.$message({
-        //   message: "检测到当前手机号，不是获取验证码的手机号，请重试！",
-        //   type: "error"
-        // });
-        // return;
+        this.$message({
+          message: "检测到当前手机号，不是获取验证码的手机号，请重试！",
+          type: "error"
+        });
+        return;
       }
-      this.tologin()
+      this.tologin();
     },
     tologin() {
       this.$axios
@@ -97,16 +98,21 @@ export default {
           phone: this.phone
         })
         .then(data => {
-
+          console.log(data.data.data);
+          if (data.data.data == "无此账号") {
+            this.base.warn(this, "暂无此账号");
+            return;
+          }
           this.$message({
             message: "登陆成功！ 尊敬的" + this.phone + "用户",
             type: "success"
           });
-          localStorage.phone = this.phone;
+          localStorage.setItem("phone1", this.phone);
           this.$store.commit("setPhone", this.phone);
           var userphone = this.phone;
           localStorage.setItem("user", JSON.stringify(userphone));
-          this.$router.push({ path: "/project" });
+          console.log("1");
+          this.$router.push("/project");
         });
     },
     // 获取验证码
@@ -115,37 +121,50 @@ export default {
         //判断手机号格式
         return;
       }
-      //   请求发短信
-
-      if (!this.isClick) {
-        this.random();
-        var contenttext =
-          "您的手机验证码为:" +
-          this.truecode +
-          "。工作人员不会向您索要，如果不是本人操作请忽略";
-        this.$axios
-          .post("/api", {
-            phonenum: this.phone,
-            contenttext
-          })
-          .then(data => {
-            this.truePhone = this.phone;
-            console.log(data);
-            this.$message.success("短信发送成功，请注意查收！");
-          });
-        this.isClick = true;
-        this.btnmsg = "还剩下60秒";
-        let n = 60;
-        timer = setInterval(() => {
-          n--;
-          this.btnmsg = `还剩下${n}秒`;
-          if (n == 0) {
-            clearInterval(timer);
-            this.btnmsg = "获取验证码";
-            this.isClick = false;
+      this.$axios
+        .post(this.baseurl + "/user/phoneLogin", {
+          phone: this.phone
+        })
+        .then(data => {
+          console.log(data.data.data);
+          if (data.data.data == "无此账号") {
+            this.base.warn(this, "暂无此账号");
+          } else {
+            sendmsg();
           }
-        }, 1000);
-      }
+        });
+      //   请求发短信
+      var sendmsg = () => {
+        if (!this.isClick) {
+          this.random();
+          var contenttext =
+            "您的手机验证码为:" +
+            this.truecode +
+            "。工作人员不会向您索要，如果不是本人操作请忽略";
+          this.$axios
+            .post("/api", {
+              phonenum: this.phone,
+              contenttext
+            })
+            .then(data => {
+              this.truePhone = this.phone;
+              console.log(data);
+              this.$message.success("短信发送成功，请注意查收！");
+            });
+          this.isClick = true;
+          this.btnmsg = "还剩下60秒";
+          let n = 60;
+          timer = setInterval(() => {
+            n--;
+            this.btnmsg = `还剩下${n}秒`;
+            if (n == 0) {
+              clearInterval(timer);
+              this.btnmsg = "获取验证码";
+              this.isClick = false;
+            }
+          }, 1000);
+        }
+      };
     },
     // 检验手机号格式
     phoneFg(v) {

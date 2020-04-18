@@ -3,10 +3,10 @@ import axios from 'axios'
 // import NProgress from 'nprogress'
 // import 'nprogress/nprogress.css'
 
-axios.interceptors.response.use((res)=>{
+axios.interceptors.response.use((res) => {
     // NProgress.done()
     return res
-},(error)=>{
+}, (error) => {
     console.log(error.response);
     // alert('数据请求失败')
     // if(error.response.status == 504){
@@ -14,19 +14,21 @@ axios.interceptors.response.use((res)=>{
     // }
 
 })
-axios.interceptors.request.use((res)=>{
+axios.interceptors.request.use((res) => {
     // NProgress.start()
     return res
-},(erro)=>{
+}, (erro) => {
     return Promise.reject(erro)
 })
-let baseurl = 'http://www.free-http.svipss.top'
+
+let baseurl = 'http://119.3.210.185:8921'
+// let baseurl = 'http://www.free-http.svipss.top'
 
 // Post
-export const Post = (url,params)=>{
-    return axios.post(`${baseurl}${url}`,params).then(data=>data)
+export const Post = (url, params) => {
+    return axios.post(`${baseurl}${url}`, params).then(data => data)
 }
 // Get
-export const Get = (params,url)=>{
-    return axios.get(`${baseurl}${url}`,params).then(data=>data)
+export const Get = (params, url) => {
+    return axios.get(`${baseurl}${url}`, params).then(data => data)
 }

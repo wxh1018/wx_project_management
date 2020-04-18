@@ -3,16 +3,16 @@ const market = {
     state: {
         user_msg: '',
         uId: '',
+        id: '',
         grade: ''
     },
     getters: {},
     mutations: {
         set_user_msg(state, v) {
             state.user_msg = v
-            let msg = v;
-            let uId = "";
-            msg.uId == 0 ? (uId = msg.id) : (uId = msg.uId);
-            state.uId = uId
+            state.uId = v.uId
+            state.id = v.id
+            console.log(`uId:${v.uId},id:${v.id}`);
         },
         set_grade(state, v) {
             state.grade = v

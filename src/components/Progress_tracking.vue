@@ -166,7 +166,7 @@
 
             <el-upload
               class="upload-demo"
-              action="http://119.3.210.185:8921/upload/add"
+              :action="upload_add"
               :on-preview="handlePreview"
               :on-remove="handleRemove"
               :on-success="handsuccess"
@@ -216,7 +216,14 @@
           </td>
           <td>时间节点</td>
           <td>
-            <el-date-picker v-model="date1" type="date" placeholder="选择日期" @change="changetime2()"></el-date-picker>
+            <el-date-picker
+              v-model="date1"
+              type="date"
+              format="yyyy 年 MM 月 dd 日"
+              value-format="yyyy-MM-dd"
+              placeholder="选择日期"
+              @change="changetime2()"
+            ></el-date-picker>
           </td>
         </tr>
         <tr>
@@ -252,7 +259,7 @@
           <td>
             <el-upload
               class="upload-demo"
-              action="http://119.3.210.185:8921/upload/add"
+              :action="upload_add"
               :on-preview="handlePreview2"
               :on-remove="handleRemove2"
               :on-success="handsuccess2"
@@ -471,6 +478,9 @@ export default {
   computed: {
     pid() {
       return this.$store.state.pId;
+    },
+    upload_add() {
+      return this.baseurl + "/upload/add";
     }
   },
   watch: {
@@ -549,9 +559,9 @@ export default {
       // console.log(file);
       // let size = file.size;
       // if (size > 1024 * 10) {
-        // this.base.warn(this, "该文件超出10M,正在取消上传");
-        // this.tipmsg1 = true;
-        // return;
+      // this.base.warn(this, "该文件超出10M,正在取消上传");
+      // this.tipmsg1 = true;
+      // return;
       // }
     },
     beforeRemove2(file, fileList2) {

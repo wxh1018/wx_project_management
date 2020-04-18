@@ -85,7 +85,7 @@ export default {
       // 项目类型
       projectType: "",
       // 项目名称
-      projectName: "",
+      projectName: '',
       // 预期合同额
       contractAmount: "",
       // 是否开跟踪号
@@ -164,11 +164,19 @@ export default {
     },
     phone() {
       return this.$store.state.phone;
+    },
+    person() {
+      //跟踪负责人
+      return this.$store.state.person.person.参与人员;
     }
   },
   watch: {},
   created() {},
-  mounted() {},
+  mounted() {
+    this.branchedpassageoptions = this.person.map(v => {
+      return { value: v.name };
+    });
+  },
   methods: {
     // 选择地区
     onChangeselected(a) {
@@ -188,6 +196,34 @@ export default {
         remark: this.remark,
         phone: this.phone
       };
+      if (this.address == "") {
+        this.base.warn(this, "请填写项目地区");
+        return;
+      }
+      if (this.projectType == "") {
+        this.base.warn(this, "请填写项目类型");
+        return;
+      }
+      if (this.projectName == "") {
+        this.base.warn(this, "请填写项目名称");
+        return;
+      }
+      if (this.trackingNumber == "") {
+        this.base.warn(this, "请选择是否开跟踪号");
+        return;
+      }
+      if (this.contractAmount == "") {
+        this.base.warn(this, "请填写预期合同额");
+        return;
+      }
+      if (this.valueLevel == "") {
+        this.base.warn(this, "请选择价值等级");
+        return;
+      }
+      if (this.principal == "") {
+        this.base.warn(this, "请选择跟踪负责人");
+        return;
+      }
       this.$axios.post(this.baseurl + "/market/insert", params).then(data => {
         if (data.status == 200) {
           this.base.suc(this, data.data);

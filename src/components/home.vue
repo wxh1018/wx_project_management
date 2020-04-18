@@ -15,7 +15,7 @@
         </div>
         <!-- 用户名称 -->
         <div class="username">
-          <b>{{this.$store.state.phone}}</b>
+          <b>{{name}}</b>
         </div>
       </el-header>
       <el-container>
@@ -66,19 +66,33 @@ export default {
   data() {
     return {
       usernamer: "",
-      grade_show: false
+      grade_show: false,
+      name:''
     };
   },
   created() {
+    if (localStorage.phone1) {
+      this.$store.commit("setPhone", localStorage.phone1);
+      this.base.AddStyle(`
+      .el-input__inner {
+          background: none !important;
+          color: #fff !important;
+          border: 1px solid #000c3b !important;
+      }`);
+      this.root();
+    }
     if (this.$store.state.root.grade == 1) {
       this.grade_show = true;
     } else {
-      this.grade_show = false;
+      this.grade_show = true;
     }
   },
   computed: {
     active() {
       return this.$store.state.active;
+    },
+    phone() {
+      return this.$store.state.phone;
     }
   },
   methods: {
@@ -86,8 +100,56 @@ export default {
     quit() {
       //清除localstorage里面的token 然后让页面跳转到登入
       localStorage.removeItem("user");
-      localStorage.removeItem("phone");
+      localStorage.removeItem("phone1");
       this.$router.push("/login");
+    },
+    // 人员
+    person1() {
+      this.uId = this.$store.state.root.uId;
+      let params = { uId: this.uId };
+      this.$axios.post(this.baseurl + "/manage/findAll", params).then(data => {
+        this.$store.commit("set_person", data.data);
+      });
+    },
+    resh() {
+      //在页面加载时读取sessionStorage里的状态信息
+      if (sessionStorage.getItem("store")) {
+        this.$store.replaceState(
+          Object.assign(
+            {},
+            this.$store.state,
+            JSON.parse(sessionStorage.getItem("store"))
+          )
+        );
+        sessionStorage.removeItem("store");
+      }
+
+      //在页面刷新时将vuex里的信息保存到sessionStorage里
+      window.addEventListener("beforeunload", () => {
+        sessionStorage.setItem("store", JSON.stringify(this.$store.state));
+      });
+    },
+    root() {
+      let phone = localStorage.phone1;
+      this.$axios
+        .post(this.baseurl + "/manage/selPhone", { phone: phone })
+        .then(data => {
+          console.log(data.data[0]);
+          this.name = data.data[0].name;
+          this.$store.commit("set_user_msg", data.data[0]);
+          this.person1();
+          let str = data.data[0].grade.trim();
+          let fg =
+            str == "方向负责人" || str == "分管负责人" || str == "项目负责人";
+          if (fg) {
+            this.$store.commit("set_grade", 1);
+            this.grade_show = true;
+          } else {
+            this.$store.commit("set_grade", 2);
+            this.grade_show = false;
+          }
+          console.log(`用户${phone}权限等级是:` + this.$store.state.root.grade);
+        });
     }
   },
   mounted() {

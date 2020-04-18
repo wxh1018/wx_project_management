@@ -8,7 +8,6 @@ const market = {
     },
     mutations: {
         set_person(state, v) {
-            console.log(v);
             state.person = v
         }
     },

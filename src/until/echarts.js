@@ -21,7 +21,7 @@ const echarts = {
             },
             series: [
                 {
-                    radius: "60%",
+                    radius: "50%",
                     name: tip,
                     type: "pie",
                     data,
@@ -39,10 +39,10 @@ const echarts = {
             ]
         });
     },
-    zhu(dom, datax, value, tip, title) {
+    zhu(obj) {
         var option = {
             title: {
-                text: title,
+                text: obj.title,
                 // subtext: "货邮数（吨）",
                 left: "center",
                 textStyle: {
@@ -51,7 +51,7 @@ const echarts = {
             },
             grid: {
                 bottom: "15%",
-                right:"10%"
+                right: "10%"
             },
             tooltip: {
                 trigger: "axis",
@@ -68,8 +68,8 @@ const echarts = {
             },
             xAxis: {
                 type: "category",
-                data: datax,
-                name: "城市名称",
+                data: obj.datax.slice(0,10),
+                name: obj.x_text,
                 axisLabel: {
                     show: true,
                     textStyle: {
@@ -94,8 +94,8 @@ const echarts = {
             },
             yAxis: {
                 type: "value",
-                name: "货物重量(t)",
-                max: 100,
+                name: obj.y_text.slice(0,10),
+                max: 10,
                 min: 0,
                 axisLabel: {
                     show: true,
@@ -124,7 +124,7 @@ const echarts = {
             },
             series: [
                 {
-                    data: value,
+                    data: obj.value,
                     type: "bar",
                     itemStyle: {
                         normal: {
@@ -160,7 +160,7 @@ const echarts = {
                 }
             ]
         };
-        dom.setOption(option);
+        obj.dom.setOption(option);
     }
 }
 export default echarts

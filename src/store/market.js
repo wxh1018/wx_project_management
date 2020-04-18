@@ -29,13 +29,14 @@ const market = {
             })
         },
         edit_totalData({ state, dispatch }, params) {
+            console.log(params);
             return Api.edit_totalData(params).then(data => {
                 dispatch('get_totalData')
                 return true
             })
         },
-        delete_totalData({ state, dispatch }) {
-            return Api.del_totalData({ id: state.edit_id }).then(data => {
+        delete_totalData({ state, dispatch }, params) {
+            return Api.del_totalData(params).then(data => {
                 dispatch('get_totalData')
                 return true
             })
@@ -64,7 +65,7 @@ const market = {
             return Api.modify_mon(params).then(data => {
                 console.log(data);
                 dispatch('get_mon_data')
-                return true
+                return data.data
             })
         }
     }

@@ -14,44 +14,44 @@
           <ul class="inlist">
             <li v-for="(item, id) in direction" :key="id">
               <p>{{item.name}}{{item.phone | filter_phone}}</p>
-              <button @click="del(1,item.id)">删除</button>
+              <button v-show="show1" @click="del(1,item.id)">删除</button>
             </li>
             <li class="none" v-if="direction.length == 0">暂无数据</li>
           </ul>
-          <button class="add" @click="add(0)">添加</button>
+          <button v-show="show1" class="add" @click="add(0)">添加</button>
         </li>
         <li>
           <h1>分管负责人</h1>
           <ul class="inlist">
             <li v-for="(item, id) in ResponsiblePerson" :key="id">
               <p>{{item.name}}{{item.phone | filter_phone}}</p>
-              <button @click="del(1,item.id)">删除</button>
+              <button v-show="show2" @click="del(1,item.id)">删除</button>
             </li>
             <li class="none" v-if="ResponsiblePerson.length == 0">暂无数据</li>
           </ul>
-          <button class="add" @click="add(1)">添加</button>
+          <button v-show="show2" class="add" @click="add(1)">添加</button>
         </li>
         <li>
           <h1>项目负责人</h1>
           <ul class="inlist">
             <li v-for="(item, id) in projectLeader" :key="id">
               <p>{{item.name}}{{item.phone | filter_phone}}</p>
-              <button @click="del(2,item.id)">删除</button>
+              <button v-show="show3" @click="del(2,item.id)">删除</button>
             </li>
             <li class="none" v-if="projectLeader.length == 0">暂无数据</li>
           </ul>
-          <button class="add" @click="add(2)">添加</button>
+          <button v-show="show3" class="add" @click="add(2)">添加</button>
         </li>
         <li>
           <h1>参与人员</h1>
           <ul class="inlist">
             <li v-for="(item, id) in participant" :key="id">
               <p>{{item.name}}{{item.phone | filter_phone}}</p>
-              <button @click="del(3,item.id)">删除</button>
+              <button v-show="show4" @click="del(3,item.id)">删除</button>
             </li>
             <li class="none" v-if="participant.length == 0">暂无数据</li>
           </ul>
-          <button class="add" @click="add(3)">添加</button>
+          <button v-show="show4" class="add" @click="add(3)">添加</button>
         </li>
       </ul>
     </main>
@@ -78,15 +78,16 @@ export default {
       direction: "", //方向负责人
       ResponsiblePerson: [], //分管数据
       projectLeader: [], //负责人
-      participant: [] //参与人员
+      participant: [], //参与人员
+      uId: "",
+      show1: false,
+      show2: false,
+      show3: false,
+      show4: false
     };
   },
   components: {},
-  computed: {
-    uId() {
-      return this.$store.state.root.uId;
-    }
-  },
+  computed: {},
   watch: {
     isshow(v) {
       if (!v) {
@@ -96,20 +97,60 @@ export default {
     }
   },
   created() {
-    this.getdata();
     this.$store.commit("set_active", "Personal");
   },
-  mounted() {},
+  mounted() {
+    let phone = localStorage.phone1;
+    this.$axios
+      .post(this.baseurl + "/manage/selPhone", { phone: phone })
+      .then(data => {
+        console.log(data);
+        this.$store.commit("set_user_msg", data.data[0]);
+        let str = data.data[0].grade.trim();
+        this.uId = data.data[0].uId;
+        this.getdata();
+        if (phone == "18260089839" || phone == "15062262545") {
+          //最高权限
+          this.show1 = true;
+          this.show2 = true;
+          this.show3 = true;
+          this.show4 = true;
+          return;
+        }
+        if (str == "方向负责人") {
+          this.show1 = true;
+          this.show2 = true;
+          this.show3 = true;
+          this.show4 = true;
+        } else if (str == "分管负责人") {
+          this.show1 = false;
+          this.show2 = false;
+          this.show3 = true;
+          this.show4 = true;
+        } else if (str == "项目负责人") {
+          this.show1 = false;
+          this.show2 = false;
+          this.show3 = false;
+          this.show4 = true;
+        } else {
+          this.show1 = false;
+          this.show2 = false;
+          this.show3 = false;
+          this.show4 = false;
+        }
+      });
+  },
   filters: {
     filter_phone(v) {
-      return "—" + v;
+      return ":" + v;
     }
   },
   methods: {
     getdata() {
       let params = { uId: this.uId };
       this.$axios.post(this.baseurl + "/manage/findAll", params).then(data => {
-        this.$store.commit('set_person',data.data)
+        console.log(data);
+        this.$store.commit("set_person", data.data);
         this.direction = data.data.方向负责人;
         this.ResponsiblePerson = data.data.分管负责人;
         this.projectLeader = data.data.项目负责人;
@@ -229,6 +270,7 @@ main {
   font-size: 20px;
   color: white;
   text-align: center;
+  margin-right: 80px;
 }
 .inlist {
   padding-top: 10px;

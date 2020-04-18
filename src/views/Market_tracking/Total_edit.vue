@@ -175,10 +175,21 @@ export default {
     },
     id() {
       return this.$store.state.market.edit_id;
+    },
+    person() {
+      //跟踪负责人
+      return this.$store.state.person.person.参与人员;
+    },
+    phone() {
+      return this.$store.state.phone;
     }
   },
   watch: {},
-  created() {},
+  created() {
+    this.branchedpassageoptions = this.person.map(v => {
+      return { value: v.name };
+    });
+  },
   mounted() {
     let v = this.total_data;
     console.log(v);
@@ -207,14 +218,44 @@ export default {
         address: this.address,
         projectType: this.projectType,
         projectName: this.projectName,
-        contractAmount: this.contractAmount,
+        contractAmount: Number(this.contractAmount),
         trackingNumber: this.trackingNumber,
         principal: this.principal,
         informationSource: this.informationSource,
         valueLevel: this.valueLevel,
         remark: this.remark,
-        id: this.id
+        id: this.id,
+        phone: this.phone
       };
+      console.log(params);
+      if (this.address == "") {
+        this.base.warn(this, "请填写项目地区");
+        return;
+      }
+      if (this.projectType == "") {
+        this.base.warn(this, "请填写项目类型");
+        return;
+      }
+      if (this.projectName == "") {
+        this.base.warn(this, "请填写项目名称");
+        return;
+      }
+      if (this.trackingNumber == "") {
+        this.base.warn(this, "请选择是否开跟踪号");
+        return;
+      }
+      if (this.contractAmount == "") {
+        this.base.warn(this, "请填写预期合同额");
+        return;
+      }
+      if (this.valueLevel == "") {
+        this.base.warn(this, "请选择价值等级");
+        return;
+      }
+      if (this.principal == "") {
+        this.base.warn(this, "请选择跟踪负责人");
+        return;
+      }
       this.$store.dispatch("edit_totalData", params).then(data => {
         this.base.suc(this, "数据更新成功");
         this.$emit("close");

@@ -38,7 +38,7 @@
               <el-button
                 type="primary"
                 class="operationbutton"
-                @click="delet({id:item.id,projectNum:item.projectNum})"
+                @click="delet({id:item.id})"
               >删除项目</el-button>
             </td>
           </tr>
@@ -112,7 +112,6 @@ export default {
     },
     total_data(v) {
       //总数据
-      console.log(v);
       this.mod_show_data(v);
     }
   },
@@ -169,7 +168,7 @@ export default {
         type: "warning"
       })
         .then(() => {
-          this.$store.dispatch("delete_totalData").then(data => {
+          this.$store.dispatch("delete_totalData",a).then(data => {
             _this.$message({
               type: "success",
               message: "删除成功!"

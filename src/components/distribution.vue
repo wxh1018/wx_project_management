@@ -141,36 +141,12 @@ export default {
       // 数组
       // 分配人员
       personneloptions: [
-        {
-          value: "丁振强"
-        },
-        {
-          value: "孙结松"
-        },
-        {
-          value: "冉旭"
-        },
-        {
-          value: "陈义"
-        },
-        {
-          value: "王苗苗"
-        },
-        {
-          value: "张礼响"
-        },
-        {
-          value: "李璇"
-        },
-        {
-          value: "于乐美"
-        },
-        {
-          value: "严晶"
-        },
-        {
-          value: "程真"
-        }
+        //   {
+        //     value: "丁振强"
+        //   },
+        //   {
+        //     value: "孙结松"
+        //   },
       ],
       // 人员分配比例
       peopleoptions: [
@@ -332,7 +308,8 @@ export default {
           id: this.id
         })
         .then(res => {
-          console.log(res);
+          console.log("分配人员", res);
+          let to = res.data[0];
           this.projectNum = res.data[0].projectNum;
           // this.na =  this.projectNum
           this.projectNam = res.data[0].projectNam;
@@ -342,14 +319,30 @@ export default {
           this.personnel = this.personnel.split(",")[0];
           this.valueId = res.data[0].id;
           let arr1 = [];
+          // 项目负责人
+          let projectLeader = { value: to.projectLeader.trim() };
+          // 分管负责人
+          let responsiblePerson = { value: to.responsiblePerson.trim() };
           arr.forEach(v => {
+            console.log(v);
+            v = v.trim();
             arr1.push({ value: v });
           });
-          this.personneloptions = arr1;
+          arr1.push(projectLeader);
+          arr1.push(responsiblePerson);
+          console.log(arr1);
+          let arr2 = [];
+          arr1.map(v => {
+            arr2.push(v.value);
+          });
+          arr2 = [...new Set(arr2)];
+          this.personneloptions = arr2.map(v => {
+            return { value: v };
+          });
           console.log(this.twoalready);
         });
     },
-    // 确认产值分配按钮
+    // 确认产值分配
     allocation() {
       if (this.proportion == "") {
         this.$message({
@@ -483,7 +476,8 @@ export default {
         id: this.id
       })
       .then(res => {
-        console.log(res);
+        console.log("分配人员", res);
+        let to = res.data[0];
         res.data.length == 0 ? (this.isshow = false) : (this.isshow = true);
         this.projectNum = res.data[0].projectNum;
         this.projectNam = res.data[0].projectNam;
@@ -494,10 +488,26 @@ export default {
 
         this.valueId = res.data[0].id;
         let arr1 = [];
+        // 项目负责人
+        let projectLeader = { value: to.projectLeader.trim() };
+        // 分管负责人
+        let responsiblePerson = { value: to.responsiblePerson.trim() };
         arr.forEach(v => {
+          console.log(v);
+          v = v.trim();
           arr1.push({ value: v });
         });
-        this.personneloptions = arr1;
+        arr1.push(projectLeader);
+        arr1.push(responsiblePerson);
+        console.log(arr1);
+        let arr2 = [];
+        arr1.map(v => {
+          arr2.push(v.value);
+        });
+        arr2 = [...new Set(arr2)];
+        this.personneloptions = arr2.map(v => {
+          return { value: v };
+        });
         this.twoalready =
           this.proportion == ""
             ? ""

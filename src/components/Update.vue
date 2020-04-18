@@ -550,11 +550,6 @@ export default {
           message: "请选择参与人员",
           type: "error"
         });
-      } else if (this.explain == "") {
-        this.$message({
-          message: "请输入说明",
-          type: "error"
-        });
       } else {
         this.standardtime = this.time;
         this.participation = this.participation.join(",");
