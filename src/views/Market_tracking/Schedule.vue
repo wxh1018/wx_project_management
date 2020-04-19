@@ -11,7 +11,7 @@
           <div>项目名称</div>
         </td>
         <td width="10%">
-          <div>项目负责人</div>
+          <div>跟踪负责人</div>
         </td>
         <td width="8%">
           <div>时间节点</div>
@@ -87,7 +87,7 @@
           </td>
         </tr>
         <tr>
-          <td>项目负责人</td>
+          <td>跟踪负责人</td>
           <td>
             <!-- <input type="text" v-model="add.projectPerson" /> -->
             <p>{{add.principal}}</p>
@@ -155,7 +155,7 @@
           </td>
         </tr>
         <tr>
-          <td>项目负责人</td>
+          <td>跟踪负责人</td>
           <td>
             <p>{{update.principal}}</p>
           </td>
@@ -228,7 +228,7 @@
         <td>序号</td>
         <td>项目名称</td>
         <td>项目编号</td>
-        <td>项目负责人</td>
+        <td>跟踪负责人</td>
         <td>时间节点</td>
         <td>工作进度</td>
         <td>收款进度</td>
@@ -704,7 +704,8 @@ export default {
       );
     },
     close() {
-      this.$em.$emit("closeProgress");
+      this.$emit("close");
+      this.$router.push("/market");
     },
     //导出
     exportData() {

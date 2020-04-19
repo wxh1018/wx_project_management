@@ -14,9 +14,10 @@ export default {
     // this.resh();
     if (!localStorage.phone1) {
       this.$router.push("/login");
-    }else{
-      this.$router.push("/");
     }
+    this.base.AddStyle(
+      ".ipt5 input{border:1px solid white;} .ipt5{margin:0 10px}"
+    );
   },
   computed: {},
   methods: {}

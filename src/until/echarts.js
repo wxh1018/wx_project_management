@@ -40,6 +40,7 @@ const echarts = {
         });
     },
     zhu(obj) {
+        let max = obj.max || 10
         var option = {
             title: {
                 text: obj.title,
@@ -95,8 +96,8 @@ const echarts = {
             yAxis: {
                 type: "value",
                 name: obj.y_text.slice(0,10),
-                max: 10,
-                min: 0,
+                // max,
+                // min: 0,
                 axisLabel: {
                     show: true,
                     textStyle: {
@@ -130,7 +131,8 @@ const echarts = {
                         normal: {
                             color: function (params) {
                                 var colorList = ['rgb(255, 2, 2)', 'rgb(255, 2, 2,.9)', 'rgb(255, 2, .8)', 'rgb(255, 2, 2,.7)', 'rgb(255, 2, 2,.6)', 'rgb(255, 2, 2,.5)', 'rgb(255, 2, 2,.4)', 'rgb(255, 2, 2,.3)', 'rgb(255, 2, 2,.2)', 'rgb(255, 2, 2,.2)',];
-                                return colorList[params.dataIndex]
+                                // return colorList[params.dataIndex]
+                                return 'skyblue'
                             }
                         }
                     },
@@ -160,6 +162,9 @@ const echarts = {
                 }
             ]
         };
+        if(max == 10){
+            option.yAxis.max = 10
+        }
         obj.dom.setOption(option);
     }
 }

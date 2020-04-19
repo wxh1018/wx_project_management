@@ -216,7 +216,7 @@
         <td>分管负责人</td>
         <td>项目负责人</td>
         <td>参与人员</td>
-        <td>时间进度</td>
+        <td>录入时间</td>
         <td>说明</td>
         <td>问题及建议</td>
         <td>备注</td>
@@ -238,7 +238,7 @@
         <td>{{this.branchedpassage}}</td>
         <td>{{this.item}}</td>
         <td>{{this.participation}}</td>
-        <td>{{this.lasttime}}</td>
+        <td>{{this.time}}</td>
         <td>{{this.explain}}</td>
         <td>{{this.suggest}}</td>
         <td>{{this.remark}}</td>
@@ -434,9 +434,19 @@ export default {
       this.itemoptions = this.person.项目负责人.map(v => {
         return { value: v.name };
       });
-      this.participationoptions = this.person.参与人员.map(v => {
+      let arr = this.person.参与人员.map(v => {
         return { value: v.name };
       });
+      for (let i = 0; i < arr.length; i++) {
+        let s = arr[i].value.replace(/\s/g, "");
+        for (let j = i + 1; j < arr.length - i; j++) {
+          let e = arr[j].value.trim(/\s/, "");
+          if (s == e) {
+            arr.splice(j, 1);
+          }
+        }
+      }
+      this.participationoptions = arr;
     },
     // 导出按钮
     detailbutton() {

@@ -85,7 +85,7 @@ export default {
       // 项目类型
       projectType: "",
       // 项目名称
-      projectName: '',
+      projectName: "",
       // 预期合同额
       contractAmount: "",
       // 是否开跟踪号
@@ -122,13 +122,13 @@ export default {
       // 合同签订情况
       addtableconcludeoptions: [
         {
-          value: "未签"
+          value: "否"
         },
         {
-          value: "已签(中设)"
+          value: "是(中设)"
         },
         {
-          value: "已签(纬信)"
+          value: "是(纬信)"
         }
       ],
       // 履约证明或节点证明
@@ -173,9 +173,19 @@ export default {
   watch: {},
   created() {},
   mounted() {
-    this.branchedpassageoptions = this.person.map(v => {
-      return { value: v.name };
+    let arr = this.person.map(v => {
+      return { value: v.name.trim() };
     });
+    for (let i = 0; i < arr.length; i++) {
+      let s = arr[i].value.replace(/\s/g, "");
+      for (let j = i + 1; j < arr.length - i; j++) {
+        let e = arr[j].value.trim(/\s/, "");
+        if (s == e) {
+          arr.splice(j, 1);
+        }
+      }
+    }
+    this.branchedpassageoptions = arr;
   },
   methods: {
     // 选择地区
@@ -227,9 +237,9 @@ export default {
       this.$axios.post(this.baseurl + "/market/insert", params).then(data => {
         if (data.status == 200) {
           this.base.suc(this, data.data);
-          this.$router.push("/market");
-          this.$store.dispatch("get_totalData");
           this.$emit("close");
+          this.$store.dispatch("get_totalData");
+          this.$router.push("/market");
         }
       });
     },

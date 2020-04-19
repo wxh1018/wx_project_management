@@ -6,7 +6,12 @@
         <tr>
           <td width="10%">项目地区</td>
           <td colspan="2">
-            <v-distpicker @selected="onChangeselected"></v-distpicker>
+            <v-distpicker
+              :province="province1"
+              :city="city1"
+              :area="area1"
+              @selected="onChangeselected"
+            ></v-distpicker>
           </td>
           <td>项目类型</td>
           <td>
@@ -183,58 +188,74 @@
     <table id="example" style="display:none">
       <tr>
         <td>项目地区</td>
-        <td colspan="2">{{this.site}}</td>
         <td>项目类型</td>
-        <td>{{this.addtabletype}}</td>
         <td>项目编号</td>
-        <td>{{this.addtablenumber}}</td>
         <td>项目名称</td>
-        <td colspan="2">{{this.addtablename}}</td>
+      </tr>
+      <tr>
+        <td>{{this.site}}</td>
+        <td>{{this.addtabletype}}</td>
+        <td>{{this.addtablenumber}}</td>
+        <td>{{this.addtablename}}</td>
       </tr>
       <tr>
         <td>合同签订情况</td>
-        <td colspan="2">{{this.addtableconclude}}</td>
         <td>合同额(万元)</td>
-        <td>{{this.contractamount}}</td>
         <td>收款(万元)</td>
-        <td>{{this.gathering}}</td>
         <td>收款比例(%)</td>
         <td
           colspan="2"
         >{{(this.contractamount == "" || this.gathering == "")?"":(this.gathering/this.contractamount).toFixed(2)}}</td>
       </tr>
       <tr>
+        <td>{{this.addtableconclude}}</td>
+        <td>{{this.contractamount}}</td>
+        <td>{{this.gathering}}</td>
+        <td>{{(this.contractamount == "" || this.gathering == "")?"":(this.gathering/this.contractamount).toFixed(2)}}</td>
+      </tr>
+      <tr>
         <td colspan="2">分包合同额(万元)</td>
-        <td>{{this.subpackage}}</td>
         <td>净合同额(万元)</td>
-        <td>{{this.contractamount-this.subpackage}}</td>
         <td>奖励系数</td>
-        <td>{{(this.award == "")?"1":this.award}}</td>
         <td colspan="2">可分配产值(万元)</td>
+      </tr>
+      <tr>
+        <td>{{this.subpackage}}</td>
+        <td>{{this.contractamount-this.subpackage}}</td>
+        <td>{{(this.award == "")?"1":this.award}}</td>
         <td>{{(this.award == "")?(this.contractamount-this.subpackage)*1:(this.contractamount-this.subpackage)*this.award}}</td>
       </tr>
       <tr>
         <td colspan="2">履约证明或节点证明</td>
-        <td colspan="2">{{this.prove}}</td>
         <td>分管负责人</td>
-        <td>{{this.branchedpassage}}</td>
         <td>项目负责人</td>
-        <td>{{this.item}}</td>
         <td>参与人员</td>
+      </tr>
+      <tr>
+        <td>{{this.prove}}</td>
+        <td>{{this.branchedpassage}}</td>
+        <td>{{this.item}}</td>
         <td>{{this.participation}}</td>
       </tr>
       <tr>
-        <td colspan="2">时间进度和说明</td>
-        <td colspan="2">{{this.standardtime}}</td>
-        <td colspan="6">{{this.explain}}</td>
+        <td>录入时间</td>
+        <td>说明</td>
       </tr>
       <tr>
-        <td colspan="2">问题及建议</td>
-        <td colspan="8">{{this.suggest}}</td>
+        <td colspan="3">{{this.time}}</td>
+        <td colspan="3">{{this.suggest}}</td>
       </tr>
       <tr>
-        <td colspan="2">备注</td>
-        <td colspan="8">{{this.remark}}</td>
+        <td>工作大纲</td>
+        <td>初步成果</td>
+        <td>中间成果</td>
+        <td>最终成果</td>
+      </tr>
+      <tr>
+        <td>{{workingOutline}}</td>
+        <td>{{firstFruits}}</td>
+        <td>{{resultsAmong}}</td>
+        <td>{{finalResult}}</td>
       </tr>
     </table>
   </div>
@@ -243,10 +264,15 @@
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.0/jquery.min.js"></script>
 <script>
 import VDistpicker from "v-distpicker";
+import FileSaver from "file-saver";
+import XLSX from "xlsx";
 export default {
   components: { VDistpicker },
   data() {
     return {
+      province1: "",
+      city1: "",
+      area1: "",
       // //工作大纲
       workingOutline: "",
       // //初步成果 ;
@@ -346,7 +372,19 @@ export default {
       // 分管负责人
       branchedpassageoptions: [
         {
-          value: "丁振强"
+          value: "胡斌"
+        },
+        {
+          value:'陈忠兵'
+        },
+        {
+          value:'陈飞'
+        },
+        {
+          value:'丁振强'
+        },
+        {
+          value:'陈晨'
         }
       ],
       // 项目负责人
@@ -422,9 +460,20 @@ export default {
       this.itemoptions = this.person.项目负责人.map(v => {
         return { value: v.name };
       });
-      this.participationoptions = this.person.参与人员.map(v => {
+      let arr = [];
+      arr = this.person.参与人员.map(v => {
         return { value: v.name };
       });
+      for (let i = 0; i < arr.length; i++) {
+        let s = arr[i].value.replace(/\s/g, "");
+        for (let j = i + 1; j < arr.length - i; j++) {
+          let e = arr[j].value.trim(/\s/, "");
+          if (s == e) {
+            arr.splice(j, 1);
+          }
+        }
+      }
+      this.participationoptions = arr;
     },
     // 选择地区
     onChangeselected(a) {
@@ -540,7 +589,7 @@ export default {
             responsiblePerson: this.branchedpassage,
             projectLeader: this.item,
             participant: this.participation,
-            date: this.standardtime,
+            date: this.time,
             schedule: this.explain,
             questionsSuggestions: this.suggest,
             remark: this.remark,
@@ -581,6 +630,9 @@ export default {
               this.remark = "";
               this.standardtime = "";
               this.ifaward = "";
+              this.province1 = "";
+              this.city1 = "";
+              this.area1 = "";
               this.$emit("clo");
             }
           });
@@ -588,18 +640,23 @@ export default {
     },
     // 导出按钮
     derive() {
-      $("#example").table2excel({
-        // 不被导出的表格行的CSS class类
-        exclude: ".noExl",
-        // 导出的Excel文档的名称，（没看到作用）
-        name: "Excel Document Name",
-        // Excel文件的名称
-        filename: "项目管理填写"
+      let et = XLSX.utils.table_to_book(document.getElementById("example")); //此处传入table的DOM节点
+      let etout = XLSX.write(et, {
+        bookType: "xlsx",
+        bookSST: true,
+        type: "array"
       });
-      this.$message({
-        message: "项目导出成功",
-        type: "success"
-      });
+      try {
+        FileSaver.saveAs(
+          new Blob([etout], {
+            type: "application/octet-stream"
+          }),
+          `项目${this.addtablename}.xlsx`
+        ); //trade-publish.xlsx 为导出的文件名
+      } catch (e) {
+        console.log(e, etout);
+      }
+      return etout;
     },
     destroyed() {
       console.log(1);

@@ -42,7 +42,8 @@ export default {
       btnmsg: "获取验证码",
       isClick: false,
       truecode: "",
-      truePhone: ""
+      truePhone: "",
+      super_admin: ["18260089839"]
     };
   },
   mounted() {
@@ -98,22 +99,45 @@ export default {
           phone: this.phone
         })
         .then(data => {
-          console.log(data.data.data);
+          //判断超级管理员
+          const super1 = () => {
+            let fg = this.super_admin.some(v => v == this.phone);
+            return fg;
+          };
+          // 是超级管理员登录
+          if (super1()) {
+            this.enter();
+            return;
+          }
           if (data.data.data == "无此账号") {
             this.base.warn(this, "暂无此账号");
             return;
           }
-          this.$message({
-            message: "登陆成功！ 尊敬的" + this.phone + "用户",
-            type: "success"
-          });
-          localStorage.setItem("phone1", this.phone);
-          this.$store.commit("setPhone", this.phone);
-          var userphone = this.phone;
-          localStorage.setItem("user", JSON.stringify(userphone));
-          console.log("1");
-          this.$router.push("/project");
+          //权限判断
+          this.$store
+            .dispatch("set_grade", { phone: this.phone })
+            .then(data => {
+              console.log(data + "级权限");
+              if (data == 1 || data == 2) {
+                this.enter();
+              } else {
+                this.base.warn(this, "权限不够,拒绝登录");
+              }
+            });
         });
+    },
+    //进入系统
+    enter() {
+      this.$message({
+        message: "登陆成功！ 尊敬的" + this.phone + "用户",
+        type: "success"
+      });
+      localStorage.setItem("phone1", this.phone);
+      this.$store.commit("setPhone", this.phone);
+      var userphone = this.phone;
+      localStorage.setItem("user", JSON.stringify(userphone));
+      console.log("1");
+      this.$router.push("/project");
     },
     // 获取验证码
     getCode() {

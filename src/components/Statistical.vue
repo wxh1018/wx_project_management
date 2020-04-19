@@ -14,7 +14,7 @@
           <div id="leftech"></div>
         </div>
         <div class="right">
-          <div id="rightech"></div>
+          <div id="type"></div>
         </div>
       </div>
       <div id="map1">
@@ -24,8 +24,11 @@
     </div>
     <div class="bottom">
       <div>
+        <!-- 项目负责人统计 -->
         <div id="left"></div>
       </div>
+      <!-- 项目地区统计 -->
+      <div id="rightech"></div>
       <div>
         <!-- <el-select v-model="value2" class="clec1" placeholder="项目名称">
           <el-option v-for="item in projectData" :key="item.value" :value="item.value"></el-option>
@@ -33,6 +36,7 @@
         <el-select v-model="value1" class="clec1" placeholder="人员名称">
           <el-option v-for="item in personData" :key="item.value" :value="item.value"></el-option>
         </el-select>
+        <!-- 产值分配人员统计 -->
         <div id="per"></div>
       </div>
     </div>
@@ -65,10 +69,11 @@ export default {
     this.$store.dispatch("get_pro_data");
   },
   mounted() {
-    this.leftEch();
     // this.rightEach();
     this.creatmap();
     this.personal();
+    this.type();
+    this.type1();
   },
   computed: {
     TotalData() {
@@ -88,11 +93,12 @@ export default {
     value1(v) {
       this.leftproName = [];
       this.bili = [];
-      let obj = this.Totaldata.filter(res => res.personnel == v);
+      console.log(this.TotalData);
+      let obj = this.Totaldata.filter(res => (res.personnel).trim() == v);
       console.log(obj);
       obj.forEach(v => {
         this.leftproName.push(v.projectNam);
-        this.bili.push(v.distributionRatio);
+        this.bili.push(v.currentDistributionRatio);
       });
       this.leftEch();
     },
@@ -151,7 +157,9 @@ export default {
             this.personData.push(v.personnel.trim());
             this.projectData.push(v.projectNam.trim());
           });
+          console.log(data.data);
           this.Totaldata = data.data;
+          this.leftEch();
           this.personData = new Set(this.personData);
           this.projectData = new Set(this.projectData);
           let arr = [];
@@ -168,10 +176,33 @@ export default {
           this.value2 = this.projectData[0].value;
         });
     },
-    //项目类型占比
+    //项目类型数量占比
     type() {
       var myChart = this.$ech.init(document.getElementById("leftech"));
-      this.echar.bing(myChart, this.pro_type, "项目占比", "项目类型占比");
+      this.echar.bing(myChart, this.pro_type, "项目占比", "项目类型数量占比");
+    },
+    //项目类型总金额占比
+    type1() {
+      var myChart = this.$ech.init(document.getElementById("type"));
+      this.$axios
+        .post(this.baseurl + "/ps/findContractAmountsum", { phone: this.phone })
+        .then(data => {
+          let res = data.data;
+          res.sort((a, b) => b.sum - a.sum);
+          let x = res.map(v => v.projectType);
+          let y = res.map(v => v.sum);
+          let obj = {
+            dom: myChart,
+            datax: x,
+            value: y,
+            x_text: "项目类型",
+            y_text: "项目总金额(万)",
+            title: "项目类型总金额占比",
+            max: 10000,
+            min: 0
+          };
+          this.echar.zhu(obj);
+        });
     },
     //项目地区统计
     area() {
@@ -207,13 +238,12 @@ export default {
       this.echar.zhu(obj);
       this.creatmsg();
     },
-    //项目负责人统计
+    //产值分配人员统计
     leftEch() {
       let data = [];
       this.bili.forEach((v, i) => {
         data.push({ name: this.leftproName[i], value: v });
       });
-      console.log(data);
       var myChart = this.$ech.init(document.getElementById("per"));
       myChart.setOption({
         tooltip: {
@@ -227,7 +257,7 @@ export default {
             color: "red",
             fontSize: 18
           },
-          //backgroundColor: "rgb(199,16,16)",
+          // backgroundColor: "white",
           top: "2%"
         },
         series: [
@@ -304,6 +334,7 @@ export default {
       this.getpoint(arr);
     },
     getpoint(arr) {
+      let that = this;
       var geocoder = new AMap.Geocoder({
         city: "" //城市设为北京，默认：“全国”
       });
@@ -314,6 +345,10 @@ export default {
           console.log(result.geocodes);
           result.geocodes.forEach((res, id) => {
             console.log(res);
+            // if (!res) {
+            //   that.base.warn(that, "地图坐标获取失败");
+            //   return;
+            // }
             let lng = res.location.lng;
             let lat = res.location.lat;
             arr1.push({
@@ -385,7 +420,7 @@ export default {
 }
 .bottom > div {
   height: 100%;
-  width: 45%;
+  width: 33%;
   position: relative;
 }
 #per {
@@ -419,7 +454,7 @@ export default {
   height: 50%;
 }
 #leftech,
-#rightech {
+#type {
   width: 100%;
   height: 100%;
 }

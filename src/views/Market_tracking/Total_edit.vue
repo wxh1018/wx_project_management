@@ -130,13 +130,13 @@ export default {
       // 合同签订情况
       addtableconcludeoptions: [
         {
-          value: "未签"
+          value: "否"
         },
         {
-          value: "已签(中设)"
+          value: "是(中设)"
         },
         {
-          value: "已签(纬信)"
+          value: "是(纬信)"
         }
       ],
       // 履约证明或节点证明
@@ -191,7 +191,8 @@ export default {
     });
   },
   mounted() {
-    let v = this.total_data;
+    let total_arr = this.total_data;
+    let v = total_arr.filter(v => v.id == this.id);
     console.log(v);
     this.address = v[0].address;
     this.projectType = v[0].projectType;

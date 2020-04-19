@@ -12,6 +12,39 @@
       <!-- 头部添加按钮 -->
       <div class="addbutton">
         <el-button type="primary" class="addproject" @click="add()">+ 添加项目</el-button>
+        <el-select
+          v-model="fg_val"
+          class="ipt5"
+          clearable
+          filterable
+          @change="find_fg"
+          placeholder="查找分管负责人"
+        >
+          <el-option
+            v-for="item in fg_data"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value"
+          ></el-option>
+        </el-select>
+        <el-select
+          v-model="xm_val"
+          class="ipt5"
+          clearable
+          filterable
+          @change="find_xm"
+          placeholder="查找项目负责人"
+        >
+          <el-option
+            v-for="item in xm_data"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value"
+          ></el-option>
+        </el-select>
+        <!-- <el-button type="primary" class="addproject" @click="find_xm">查找项目负责人</el-button> -->
+
+        <!-- <el-button type="primary" class="addproject" @click="find_fg">查找分管负责人</el-button> -->
       </div>
       <!-- 表格 -->
       <div class="projecttable">
@@ -19,6 +52,7 @@
           <tr>
             <th>项目编号</th>
             <th>项目名称</th>
+            <th>分管负责人</th>
             <th>项目负责人</th>
             <th>录入时间</th>
             <th>操作</th>
@@ -26,6 +60,7 @@
           <tr v-for="(item,index) in allproject" :key="index">
             <td>{{item.projectNum}}</td>
             <td>{{item.projectNam}}</td>
+            <td>{{item.responsiblePerson}}</td>
             <td>{{item.projectLeader}}</td>
             <td>{{item.date}}</td>
             <td class="lasttd">
@@ -47,7 +82,7 @@
             </td>
           </tr>
           <tr v-if="this.allproject.length == 0">
-            <td colspan="9">此项目暂无产值分配</td>
+            <td colspan="9">暂无数据</td>
           </tr>
         </table>
       </div>
@@ -99,7 +134,7 @@ export default {
   },
   data() {
     return {
-      Progress:false,
+      Progress: false,
       adddialogVisible: false,
       distributiondialogVisible: false,
       detaildialogVisible: false,
@@ -112,13 +147,50 @@ export default {
       allproject1: [],
       currentPage3: 1,
       pageSize: 10,
-      data: []
+      data: [],
+      xm_data: [
+        {
+          value: "选项1"
+        }
+      ],
+      fg_data: [
+        {
+          value: "选项1"
+        }
+      ],
+      xm_val: "",
+      fg_val: ""
     };
   },
   created() {
-    this.$store.commit('set_active','project')
+    this.$store.commit("set_active", "project");
+    this.base.AddStyle(
+      ".ipt5 input{border:1px solid white;} .ipt5{margin:0 10px}"
+    );
   },
   methods: {
+    // 查找项目负责人
+    find_xm() {
+      if (this.xm_val == "") {
+        this.allproject = this.allproject1.slice(0, 10);
+        return;
+      }
+      this.fg_val = "";
+      this.allproject = this.allproject1.filter(
+        v => v.projectLeader == this.xm_val
+      );
+    },
+    // 查找分管负责人
+    find_fg() {
+      if (this.fg_val == "") {
+        this.allproject = this.allproject1.slice(0, 10);
+        return;
+      }
+      this.xm_val = "";
+      this.allproject = this.allproject1.filter(
+        v => v.responsiblePerson.trim() == this.fg_val
+      );
+    },
     //关闭产值分配弹窗
     close1() {
       this.distributiondialogVisible = false;
@@ -135,6 +207,14 @@ export default {
             this.currentPage3 * this.pageSize
           );
           this.allproject = this.data;
+          //项目负责人
+          this.xm_data = res.data.map(v => {
+            return { value: v.projectLeader };
+          });
+          //分管负责人
+          this.fg_data = res.data.map(v => {
+            return { value: v.responsiblePerson.trim() };
+          });
         });
     },
     // 点击跳分页
@@ -154,8 +234,8 @@ export default {
     // 进度追踪
     Progress_tracking(a) {
       this.$store.commit("setPid", a);
-      let obj = this.data.filter(v=>v.id == a)[0]
-      this.$store.commit('setthreeproject',obj)
+      let obj = this.data.filter(v => v.id == a)[0];
+      this.$store.commit("setthreeproject", obj);
       this.Progress = true;
       this.emit = a;
     },

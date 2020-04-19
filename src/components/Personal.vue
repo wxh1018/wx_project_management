@@ -10,7 +10,7 @@
       <p class="phone">尊敬的用户：{{this.$store.state.phone}}</p>
       <ul class="list">
         <li>
-          <h1>方向负责人</h1>
+          <h1>总体负责人</h1>
           <ul class="inlist">
             <li v-for="(item, id) in direction" :key="id">
               <p>{{item.name}}{{item.phone | filter_phone}}</p>
@@ -80,10 +80,11 @@ export default {
       projectLeader: [], //负责人
       participant: [], //参与人员
       uId: "",
-      show1: false,
-      show2: false,
-      show3: false,
-      show4: false
+      show1: true,
+      show2: true,
+      show3: true,
+      show4: true,
+      id: ""
     };
   },
   components: {},
@@ -106,38 +107,9 @@ export default {
       .then(data => {
         console.log(data);
         this.$store.commit("set_user_msg", data.data[0]);
-        let str = data.data[0].grade.trim();
+        this.id = data.data[0].id;
         this.uId = data.data[0].uId;
         this.getdata();
-        if (phone == "18260089839" || phone == "15062262545") {
-          //最高权限
-          this.show1 = true;
-          this.show2 = true;
-          this.show3 = true;
-          this.show4 = true;
-          return;
-        }
-        if (str == "方向负责人") {
-          this.show1 = true;
-          this.show2 = true;
-          this.show3 = true;
-          this.show4 = true;
-        } else if (str == "分管负责人") {
-          this.show1 = false;
-          this.show2 = false;
-          this.show3 = true;
-          this.show4 = true;
-        } else if (str == "项目负责人") {
-          this.show1 = false;
-          this.show2 = false;
-          this.show3 = false;
-          this.show4 = true;
-        } else {
-          this.show1 = false;
-          this.show2 = false;
-          this.show3 = false;
-          this.show4 = false;
-        }
       });
   },
   filters: {
@@ -147,7 +119,13 @@ export default {
   },
   methods: {
     getdata() {
-      let params = { uId: this.uId };
+      var params = {};
+      if (this.uId == 0) {
+        params = { uId: this.id };
+      } else {
+        params = { uId: this.uId };
+      }
+      console.log(params);
       this.$axios.post(this.baseurl + "/manage/findAll", params).then(data => {
         console.log(data);
         this.$store.commit("set_person", data.data);
@@ -155,6 +133,19 @@ export default {
         this.ResponsiblePerson = data.data.分管负责人;
         this.projectLeader = data.data.项目负责人;
         this.participant = data.data.参与人员;
+
+        for (let i = 0; i < this.participant.length; i++) {
+          let s = this.participant[i].name.replace(/\s/g, "");
+          for (let j = i + 1; j < this.participant.length - i; j++) {
+            let e = this.participant[j].name.trim(/\s/, "");
+            if (s == e) {
+              this.participant.splice(j, 1);
+            }
+          }
+        }
+        this.participant.sort((a, b) => {
+          return a.id - b.id;
+        });
       });
     },
     del(a, b) {
@@ -191,7 +182,7 @@ export default {
         ? (this.title = "项目负责人")
         : i == 3
         ? (this.title = "参与人员")
-        : (this.title = "方向负责人");
+        : (this.title = "总体负责人");
     },
     //取消
     des() {
@@ -200,12 +191,28 @@ export default {
     },
     //确认添加
     sure() {
-      let params = {
-        grade: this.title,
-        name: this.iptvalue,
-        phone: this.iptphone,
-        uId: this.uId
-      };
+      var params = {};
+      var title = "";
+      if (this.title == "总体负责人") {
+        title = "方向负责人";
+      } else {
+        title = this.title;
+      }
+      if (this.uId == 0) {
+        params = {
+          grade: title,
+          name: this.iptvalue.trim(),
+          phone: this.iptphone,
+          uId: this.id
+        };
+      } else {
+        params = {
+          grade: title,
+          name: this.iptvalue.trim(),
+          phone: this.iptphone,
+          uId: this.uId
+        };
+      }
       if (this.iptvalue == "") {
         this.tip(`请输入${this.title}`);
         return;
@@ -222,6 +229,115 @@ export default {
           this.getdata();
           this.iptvalue = "";
         });
+    },
+    autoadd() {
+      let name = [
+        "胡斌",
+        "陈忠兵",
+        "陈飞",
+        "丁振强",
+        "陈晨",
+        "黄思思",
+        "韩光",
+        "魏永平",
+        "孙如龙",
+        "刘巧仙",
+        "王可庆",
+        "鲍辰瑜",
+        "钱皓寅",
+        "邱虹淦",
+        "夏斯明",
+        "孙结松",
+        "沈颖洁",
+        "孙志文",
+        "赵玉洁",
+        "丁品文",
+        "冉旭",
+        "金春良",
+        "徐赛娜",
+        "刘雨婷",
+        "王苗苗",
+        "陈义",
+        "李璇",
+        "许景蕊",
+        "于乐美",
+        "李云峰",
+        "仲小燕",
+        "张礼响",
+        "严晶",
+        "蔡云培",
+        "胡小海",
+        "程真",
+        "檀文芳",
+        "周洋",
+        "史伟",
+        "陈相州"
+      ];
+      let phone = [
+        "13813930159",
+        "13655197750",
+        "13951685690",
+        "15062262545",
+        "13805161191",
+        "17851226699",
+        "15261415693",
+        "13851691314",
+        "15150671896",
+        "13451868110",
+        "13512540378",
+        "13675149608",
+        "13621598538",
+        "15950525835",
+        "18751844636",
+        "18502554580",
+        "15850595585",
+        "18625152092",
+        "15950477759",
+        "13776442340",
+        "18795898770",
+        "13585148658",
+        "18913348135",
+        "18362981009",
+        "15905168476",
+        "13315434476",
+        "15951904557",
+        "18761606152",
+        "18353135277",
+        "15251866223",
+        "18915996171",
+        "15380967223",
+        "18974537778",
+        "13770712685",
+        "13068307205",
+        "17551080560",
+        "18705190327",
+        "18221806787",
+        "18013997828",
+        "18252088547"
+      ];
+      const auto = (name, phone) => {
+        let n = 0;
+        var timer = null;
+        timer = setInterval(() => {
+          let params = {
+            grade: "参与人员",
+            name: name[n],
+            phone: phone[n],
+            uId: 10
+          };
+          this.$axios
+            .post(this.baseurl + "/manage/addManage", params)
+            .then(data => {
+              console.log(name[n] + "已导入成功" + n);
+            });
+          if (n == name.length - 1) {
+            clearInterval(timer);
+            return;
+          }
+          n++;
+        }, 2000);
+      };
+      auto(name, phone);
     },
     tip(v) {
       this.$message({ type: "error", message: v });

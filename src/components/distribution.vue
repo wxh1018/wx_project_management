@@ -60,13 +60,13 @@
         <tr>
           <th>项目编号</th>
           <th>项目名称</th>
-          <th>可分配产值(万)</th>
+          <th>可分配产值(万元)</th>
           <th>分配比例(%)</th>
-          <th>可分配产值(万)</th>
-          <th>分配人员</th>
+          <th width="15%">2020可分配产值(万元)</th>
+          <th width="10%">分配人员</th>
           <th>人员分配比例(%)</th>
-          <th>分配产值</th>
-          <th width="20%">操作</th>
+          <th>分配产值(万元)</th>
+          <th width="23%">操作</th>
         </tr>
         <tr v-for="(item,index) in changeallocationdata" :key="index">
           <td>{{item.projectNum}}</td>
@@ -91,7 +91,7 @@
           </td>
         </tr>
         <tr v-if="this.changeallocationdata == ''">
-          <td colspan="9">此项目暂无产值分配</td>
+          <td colspan="9">暂无数据</td>
         </tr>
       </table>
     </div>
@@ -237,7 +237,7 @@ export default {
       emit: "",
       na: "",
       twoData: [],
-      pNum: "", //可分配人员
+      pNum: "0", //可分配人员
       hasbili: "" //可分配比例
     };
   },

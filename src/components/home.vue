@@ -15,7 +15,7 @@
         </div>
         <!-- 用户名称 -->
         <div class="username">
-          <b>{{name}}</b>
+          <b>{{this.$store.state.phone}}</b>
         </div>
       </el-header>
       <el-container>
@@ -67,7 +67,7 @@ export default {
     return {
       usernamer: "",
       grade_show: false,
-      name:''
+      name: ""
     };
   },
   created() {
@@ -81,11 +81,6 @@ export default {
       }`);
       this.root();
     }
-    if (this.$store.state.root.grade == 1) {
-      this.grade_show = true;
-    } else {
-      this.grade_show = true;
-    }
   },
   computed: {
     active() {
@@ -95,6 +90,7 @@ export default {
       return this.$store.state.phone;
     }
   },
+  watch: {},
   methods: {
     // 退出按钮
     quit() {
@@ -131,29 +127,22 @@ export default {
     },
     root() {
       let phone = localStorage.phone1;
-      this.$axios
-        .post(this.baseurl + "/manage/selPhone", { phone: phone })
-        .then(data => {
-          console.log(data.data[0]);
-          this.name = data.data[0].name;
-          this.$store.commit("set_user_msg", data.data[0]);
-          this.person1();
-          let str = data.data[0].grade.trim();
-          let fg =
-            str == "方向负责人" || str == "分管负责人" || str == "项目负责人";
-          if (fg) {
-            this.$store.commit("set_grade", 1);
-            this.grade_show = true;
-          } else {
-            this.$store.commit("set_grade", 2);
-            this.grade_show = false;
-          }
-          console.log(`用户${phone}权限等级是:` + this.$store.state.root.grade);
-        });
+      this.$store.dispatch("set_grade", { phone });
     }
   },
   mounted() {
     this.usernamer = JSON.parse(localStorage.getItem("user"));
+
+    this.$store.dispatch("set_grade", { phone: this.phone }).then(v => {
+      if (v == 1) {
+        this.grade_show = true;
+      } else {
+        this.grade_show = false;
+        localStorage.removeItem("user");
+        localStorage.removeItem("phone1");
+        this.$router.push("/login");
+      }
+    });
   }
 };
 </script>

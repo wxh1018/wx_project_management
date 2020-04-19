@@ -14,3 +14,6 @@ export const get_total_byid = (params) => Api.Post('/ps/selOne', params)
 // 根据手机号查询项目组负责人项目总和
 
 export const get_fuze = (params) => Api.Post('/ps/findCount', params)
+
+// grade/
+export const grade = (params) => Api.Post('/manage/selPhone', params)

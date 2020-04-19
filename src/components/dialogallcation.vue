@@ -49,7 +49,7 @@
               @select="handleSelect"
             ></el-autocomplete>
           </td>
-          <td>分配产值</td>
+          <td>分配产值(万元)</td>
           <td>{{(this.people == "")?"":(this.people * this.distributableValue * this.proportion).toFixed(2)/10000}}</td>
         </tr>
       </table>

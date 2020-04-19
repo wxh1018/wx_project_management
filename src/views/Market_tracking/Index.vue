@@ -10,6 +10,21 @@
       <!-- 头部添加按钮 -->
       <div class="addbutton">
         <el-button type="primary" class="addproject" @click="add()">+ 添加市场信息</el-button>
+        <el-select
+          v-model="gz_val"
+          class="ipt5"
+          clearable
+          filterable
+          @change="find_gz"
+          placeholder="查找跟踪负责人"
+        >
+          <el-option
+            v-for="item in gz_data"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value"
+          ></el-option>
+        </el-select>
       </div>
       <!-- 表格 -->
       <div class="projecttable">
@@ -35,15 +50,11 @@
                 class="operationbutton"
                 @click="Progress_tracking(item.id)"
               >进度跟踪</el-button>
-              <el-button
-                type="primary"
-                class="operationbutton"
-                @click="delet({id:item.id})"
-              >删除项目</el-button>
+              <el-button type="primary" class="operationbutton" @click="delet({id:item.id})">删除项目</el-button>
             </td>
           </tr>
           <tr v-if="this.show_data.length == 0">
-            <td colspan="9">此项目暂无产值分配</td>
+            <td colspan="9">暂无数据</td>
           </tr>
         </table>
       </div>
@@ -69,6 +80,8 @@
 export default {
   data() {
     return {
+      gz_val: "",
+      gz_data: [],
       // 地址
       // private String address;
       // // 项目类型
@@ -113,6 +126,10 @@ export default {
     total_data(v) {
       //总数据
       this.mod_show_data(v);
+      //跟踪负责人
+      this.gz_data = v.map(v => {
+        return { value: v.principal };
+      });
     }
   },
   created() {
@@ -123,6 +140,13 @@ export default {
     this.$store.dispatch("get_totalData");
   },
   methods: {
+    find_gz() {
+      if (this.gz_val == "") {
+        this.show_data = this.total_data.slice(0,10);
+        return;
+      }
+      this.show_data = this.total_data.filter(v => v.principal == this.gz_val);
+    },
     //关闭页面
     close() {
       this.show_dialog = false;
@@ -168,7 +192,7 @@ export default {
         type: "warning"
       })
         .then(() => {
-          this.$store.dispatch("delete_totalData",a).then(data => {
+          this.$store.dispatch("delete_totalData", a).then(data => {
             _this.$message({
               type: "success",
               message: "删除成功!"
