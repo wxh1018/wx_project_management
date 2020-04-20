@@ -177,7 +177,7 @@ export default {
       }
       this.fg_val = "";
       this.allproject = this.allproject1.filter(
-        v => v.projectLeader == this.xm_val
+        v => v.projectLeader.trim() == this.xm_val
       );
     },
     // 查找分管负责人
@@ -208,12 +208,20 @@ export default {
           );
           this.allproject = this.data;
           //项目负责人
-          this.xm_data = res.data.map(v => {
-            return { value: v.projectLeader };
+          var arr1 = [];
+          var arr2 = [];
+          res.data.forEach(v => {
+            arr1.push(v.projectLeader.trim());
+            arr2.push(v.responsiblePerson.trim());
+          });
+          arr1 = [...new Set(arr1)];
+          arr2 = [...new Set(arr2)];
+          this.xm_data = arr1.map(v => {
+            return { value: v };
           });
           //分管负责人
-          this.fg_data = res.data.map(v => {
-            return { value: v.responsiblePerson.trim() };
+          this.fg_data = arr2.map(v => {
+            return { value: v };
           });
         });
     },

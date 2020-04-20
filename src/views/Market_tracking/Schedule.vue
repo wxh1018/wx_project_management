@@ -45,7 +45,7 @@
             <div class="view" @click="fileview(item.id)">查看</div>
           </td>
           <td class="btn">
-            <button class="basebtn twobtn" @click="updateview(item.id)">更新</button>
+            <!-- <button class="basebtn twobtn" @click="updateview(item.id)">更新</button> -->
             <button class="basebtn twobtn" @click="del(item.id)">删除</button>
           </td>
         </tr>

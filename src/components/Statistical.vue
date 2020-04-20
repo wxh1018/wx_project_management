@@ -69,7 +69,6 @@ export default {
     this.$store.dispatch("get_pro_data");
   },
   mounted() {
-    // this.rightEach();
     this.creatmap();
     this.personal();
     this.type();
@@ -94,11 +93,11 @@ export default {
       this.leftproName = [];
       this.bili = [];
       console.log(this.TotalData);
-      let obj = this.Totaldata.filter(res => (res.personnel).trim() == v);
+      let obj = this.Totaldata.filter(res => res.personnel.trim() == v);
       console.log(obj);
       obj.forEach(v => {
         this.leftproName.push(v.projectNam);
-        this.bili.push(v.currentDistributionRatio);
+        this.bili.push(v.distributionRatio);
       });
       this.leftEch();
     },
@@ -244,11 +243,13 @@ export default {
       this.bili.forEach((v, i) => {
         data.push({ name: this.leftproName[i], value: v });
       });
+      console.log(data);
       var myChart = this.$ech.init(document.getElementById("per"));
       myChart.setOption({
         tooltip: {
           trigger: "item",
-          formatter: "{a} <br/>项目:{b},分配比例:{c}% <br/>(单个占比{d}%)"
+          formatter:
+            "{a} <br/>项目:{b}<br/>分配比例:{c}%"
         },
         title: {
           text: "产值分配人员统计",
@@ -262,14 +263,14 @@ export default {
         },
         series: [
           {
-            radius: "66%",
+            radius: "40%",
             name: "项目占比",
             type: "pie",
             // radius: "55%",
             data: data,
             label: {
               show: true,
-              formatter: "{b},比例{c}%",
+              formatter: `{b},比例{c}%`,
               // position: "inside",
               verticalAlign: "middle",
               textStyle: {
@@ -282,6 +283,17 @@ export default {
       });
 
       // myChart.setOption(option);
+    },
+    //项目负责人项目统计
+    personal() {
+      Api.get_fuze({ phone: this.phone }).then(data => {
+        let arr = data.data.map(v => {
+          let obj = { name: `${v.projectLeader}`, value: v.count };
+          return obj;
+        });
+        var myChart = this.$ech.init(document.getElementById("left"));
+        this.echar.bing(myChart, arr, "项目数", "项目负责人项目统计", "40%");
+      });
     },
     rightEach() {
       console.log(this.value);
@@ -380,18 +392,6 @@ export default {
           log.error("根据地址查询位置失败");
         }
       });
-    },
-    //项目负责人项目统计
-    personal() {
-      console.log(this.phone);
-      Api.get_fuze({ phone: this.phone }).then(data => {
-        let arr = data.data.map(v => {
-          let obj = { name: `负责人${v.projectLeader}`, value: v.count };
-          return obj;
-        });
-        var myChart = this.$ech.init(document.getElementById("left"));
-        this.echar.bing(myChart, arr, "项目数", "项目负责人项目统计");
-      });
     }
   }
 };
@@ -417,6 +417,7 @@ export default {
   box-sizing: border-box;
   display: flex;
   justify-content: space-around;
+  margin-top: 40px;
 }
 .bottom > div {
   height: 100%;

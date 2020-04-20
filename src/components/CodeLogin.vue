@@ -151,10 +151,19 @@ export default {
         })
         .then(data => {
           console.log(data.data.data);
-          if (data.data.data == "无此账号") {
-            this.base.warn(this, "暂无此账号");
+          if (!data.data.data) {
+            this.base.warn(this, "系统提示:账号不存在");
           } else {
-            sendmsg();
+            this.$store
+              .dispatch("set_grade", { phone: this.phone })
+              .then(data => {
+                console.log(data + "级权限");
+                if (data == 1 || data == 2) {
+                  sendmsg();
+                } else {
+                  this.base.warn(this, "系统提示:权限不够");
+                }
+              });
           }
         });
       //   请求发短信

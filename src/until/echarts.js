@@ -1,5 +1,6 @@
 const echarts = {
-    bing(dom, data, tip, title) {
+    bing(dom, data, tip, title, radius) {
+        radius = radius || '50%'
         dom.setOption({
             title: {
                 text: title,
@@ -17,11 +18,11 @@ const echarts = {
             },
             tooltip: {
                 trigger: "item",
-                formatter: "{a} <br/>{b} : {c} 个(占比{d}%)"
+                formatter: "{a} <br/>{b}:{c}个(占比{d}%)"
             },
             series: [
                 {
-                    radius: "50%",
+                    radius: radius,
                     name: tip,
                     type: "pie",
                     data,
@@ -51,7 +52,7 @@ const echarts = {
                 }
             },
             grid: {
-                bottom: "15%",
+                bottom: "20%",
                 right: "10%"
             },
             tooltip: {
@@ -69,7 +70,7 @@ const echarts = {
             },
             xAxis: {
                 type: "category",
-                data: obj.datax.slice(0,10),
+                data: obj.datax.slice(0, 10),
                 name: obj.x_text,
                 axisLabel: {
                     show: true,
@@ -78,8 +79,8 @@ const echarts = {
                         fontSize: 14
                     },
                     formatter: function (param) {
-                        if (param.length > 10) {
-                            param.slice(0, 10) + "...";
+                        if (param.length > 3) {
+                            param = param.slice(0, 3) + "...";
                         }
                         return param.split("").join("\n");
                     }
@@ -95,7 +96,7 @@ const echarts = {
             },
             yAxis: {
                 type: "value",
-                name: obj.y_text.slice(0,10),
+                name: obj.y_text.slice(0, 10),
                 // max,
                 // min: 0,
                 axisLabel: {
@@ -162,7 +163,7 @@ const echarts = {
                 }
             ]
         };
-        if(max == 10){
+        if (max == 10) {
             option.yAxis.max = 10
         }
         obj.dom.setOption(option);

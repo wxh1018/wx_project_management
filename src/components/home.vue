@@ -136,11 +136,12 @@ export default {
     this.$store.dispatch("set_grade", { phone: this.phone }).then(v => {
       if (v == 1) {
         this.grade_show = true;
-      } else {
+      } else if (v == 2) {
         this.grade_show = false;
+      } else {
+        this.$router.push("/login");
         localStorage.removeItem("user");
         localStorage.removeItem("phone1");
-        this.$router.push("/login");
       }
     });
   }
