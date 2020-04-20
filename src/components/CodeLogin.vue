@@ -322,6 +322,7 @@ export default {
 }
 .logo {
   width: 40px;
+  height: 30px;
   top: 30px;
   /* border: 1px solid red; */
   display: flex;
