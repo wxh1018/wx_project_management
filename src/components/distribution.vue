@@ -41,7 +41,7 @@
               @select="handleSelect"
             ></el-autocomplete>
           </td>
-          <td>分配产值</td>
+          <td>分配产值(万元)</td>
           <td>{{(this.people == "")?"":(this.people * this.distributableValue * this.proportion).toFixed(2)/100/100}}</td>
         </tr>
       </table>
@@ -61,7 +61,7 @@
           <th>项目编号</th>
           <th>项目名称</th>
           <th>可分配产值(万元)</th>
-          <th>分配比例(%)</th>
+          <th>2020年分配比例(%)</th>
           <th width="15%">2020可分配产值(万元)</th>
           <th width="10%">分配人员</th>
           <th>人员分配比例(%)</th>
